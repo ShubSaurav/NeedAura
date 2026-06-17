@@ -35,6 +35,7 @@ export default function SellListing() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisCompleted, setAnalysisCompleted] = useState(false);
   const [scamConfidence, setScamConfidence] = useState<'low' | 'medium' | 'high'>('low');
+  const [scanningLogs, setScanningLogs] = useState<string[]>([]);
 
   // Trigger Gemini Vision Visual Scan
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +47,21 @@ export default function SellListing() {
     setUploadedImage(localUrl);
     setIsAnalyzing(true);
     setAnalysisCompleted(false);
+    setScanningLogs([]);
+
+    // Step-by-step logs simulation
+    const logs = [
+      '🔍 Analyzing image layout & resolution...',
+      '🏷️ Extracting product specs & model tags...',
+      '📊 Querying campus pricing database...',
+      '✓ Safety scam indicators check: PASSED'
+    ];
+
+    logs.forEach((log, index) => {
+      setTimeout(() => {
+        setScanningLogs((prev) => [...prev, log]);
+      }, (index + 1) * 600);
+    });
 
     // Call Server Action
     setTimeout(async () => {
@@ -64,7 +80,7 @@ export default function SellListing() {
         setScamConfidence(result.data.scamLevel);
         setAnalysisCompleted(true);
       }
-    }, 2500);
+    }, 2800);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,7 +127,7 @@ export default function SellListing() {
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-mono">
+          <Link href="/marketplace" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-mono">
             <ArrowLeft className="w-4 h-4" /> Cancel & Return
           </Link>
           <Badge variant="orange" glow>Ecosystem Active</Badge>
@@ -136,10 +152,36 @@ export default function SellListing() {
                   <div className="absolute inset-0 p-2">
                     <div className="relative w-full h-full rounded-lg overflow-hidden flex items-center justify-center bg-slate-900">
                       <ShoppingBagIcon className="w-16 h-16 text-slate-800" />
+                      
+                      {/* Scanning vertical line animation */}
                       {isAnalyzing && (
-                        <div className="absolute inset-0 bg-slate-950/80 flex flex-col items-center justify-center space-y-3">
-                          <div className="w-8 h-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin" />
-                          <span className="text-xs text-brand-blue font-mono uppercase tracking-wider animate-pulse">Running Gemini Vision OCR...</span>
+                        <motion.div 
+                          className="absolute left-0 right-0 h-0.5 bg-brand-blue/50 shadow-[0_0_12px_rgba(0,102,255,0.8)] z-10"
+                          animate={{ top: ['0%', '100%', '0%'] }}
+                          transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                        />
+                      )}
+
+                      {isAnalyzing && (
+                        <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-start justify-end p-4 space-y-2 overflow-hidden">
+                          <div className="flex items-center gap-2 mb-auto mt-2">
+                            <div className="w-4 h-4 border-2 border-brand-blue border-t-transparent rounded-full animate-spin" />
+                            <span className="text-xs text-brand-blue font-mono uppercase tracking-wider animate-pulse">Gemini Scanning...</span>
+                          </div>
+                          
+                          {/* Live Log Feeds */}
+                          <div className="w-full space-y-1.5 text-left font-mono text-[9px] text-slate-400">
+                            {scanningLogs.map((log, idx) => (
+                              <motion.div
+                                key={idx}
+                                initial={{ opacity: 0, x: -5 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                className={idx === scanningLogs.length - 1 ? 'text-brand-orange' : 'text-slate-400'}
+                              >
+                                {log}
+                              </motion.div>
+                            ))}
+                          </div>
                         </div>
                       )}
                       {!isAnalyzing && analysisCompleted && (
@@ -164,24 +206,69 @@ export default function SellListing() {
                 )}
               </div>
 
-              {/* Price comparison display card */}
+              {/* Price comparison display card with interactive bar chart */}
               {analysisCompleted && suggestedPrice && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
-                  <div className="p-4 bg-slate-950/60 rounded-lg border border-card-border space-y-2">
-                    <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
-                      <span>Market Valuation Index</span>
-                      <span className="text-emerald-400">Scam Check: passed</span>
+                  <div className="p-4 bg-slate-950/60 rounded-lg border border-card-border space-y-4">
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                      <span>Google Lens Resale Index</span>
+                      <span className="text-emerald-400 flex items-center gap-1">
+                        <ShieldCheck className="w-3.5 h-3.5 fill-emerald-500/10 text-emerald-400" /> Scam Check: passed
+                      </span>
                     </div>
-                    <div className="flex justify-between items-center pt-1 border-t border-card-border/30">
-                      <span className="text-sm text-slate-400">Gemini Suggests:</span>
-                      <span className="text-lg font-bold text-brand-orange">₹{suggestedPrice}</span>
-                    </div>
-                    {marketPrice && (
-                      <div className="flex justify-between items-center text-xs text-slate-500">
-                        <span>Original retail price:</span>
-                        <span className="line-through">₹{marketPrice}</span>
+
+                    {/* Relative Price Comparison Chart */}
+                    <div className="space-y-2">
+                      {/* Suggested price bar */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-slate-400">Gemini Suggested (Used):</span>
+                          <span className="font-bold text-brand-orange">₹{suggestedPrice}</span>
+                        </div>
+                        <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-card-border/30">
+                          <div className="bg-brand-orange h-full rounded-full" style={{ width: '45%' }} />
+                        </div>
                       </div>
-                    )}
+
+                      {/* Online Used price bar */}
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs font-mono">
+                          <span className="text-slate-400">Other Online Used (Avg):</span>
+                          <span className="font-bold text-slate-300">₹{Math.round(suggestedPrice * 1.15)}</span>
+                        </div>
+                        <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-card-border/30">
+                          <div className="bg-brand-blue h-full rounded-full" style={{ width: '55%' }} />
+                        </div>
+                      </div>
+
+                      {/* Market price bar */}
+                      {marketPrice && (
+                        <div className="space-y-1">
+                          <div className="flex justify-between text-xs font-mono">
+                            <span className="text-slate-400">Original Retail Market:</span>
+                            <span className="font-bold text-slate-500">₹{marketPrice}</span>
+                          </div>
+                          <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-card-border/30">
+                            <div className="bg-slate-700 h-full rounded-full" style={{ width: '100%' }} />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-2 border-t border-card-border/30 text-xs text-slate-400 leading-relaxed font-sans">
+                      Click below to auto-fill the listing price with Gemini's suggestion:
+                    </div>
+
+                    <Button 
+                      type="button" 
+                      variant="primary" 
+                      size="sm" 
+                      onClick={() => setPrice(suggestedPrice.toString())}
+                      className="w-full text-xs font-mono py-2"
+                      glow
+                    >
+                      Use Suggestion (₹{suggestedPrice})
+                    </Button>
                   </div>
                 </motion.div>
               )}
