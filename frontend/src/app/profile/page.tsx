@@ -76,6 +76,9 @@ export default function ProfileDashboard() {
           <Link href="/collaborate">
             <Button variant="ghost" size="sm">Collaborate</Button>
           </Link>
+          <Link href="/vendors">
+            <Button variant="ghost" size="sm">Vendors</Button>
+          </Link>
           <Badge variant="blue" glow>Active Session</Badge>
         </div>
       </header>

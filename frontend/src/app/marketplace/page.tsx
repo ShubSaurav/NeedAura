@@ -119,6 +119,9 @@ export default function MarketplaceFeed() {
           <Link href="/collaborate">
             <Button variant="ghost" size="sm">Collaborate</Button>
           </Link>
+          <Link href="/vendors">
+            <Button variant="ghost" size="sm">Vendors</Button>
+          </Link>
           <Link href="/profile">
             <Button variant="ghost" size="sm">Dashboard</Button>
           </Link>

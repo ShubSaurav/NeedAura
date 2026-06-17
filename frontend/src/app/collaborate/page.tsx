@@ -108,6 +108,12 @@ export default function CollaborateHub() {
           <Link href="/needs">
             <Button variant="ghost" size="sm">Needs Feed</Button>
           </Link>
+          <Link href="/collaborate">
+            <Button variant="ghost" size="sm">Collaborate</Button>
+          </Link>
+          <Link href="/vendors">
+            <Button variant="ghost" size="sm">Vendors</Button>
+          </Link>
           <Link href="/leaderboard">
             <Button variant="ghost" size="sm">Leaderboard</Button>
           </Link>

@@ -61,6 +61,9 @@ export default function Home() {
           <Link href="/collaborate">
             <Button variant="ghost" size="sm">Collaborate</Button>
           </Link>
+          <Link href="/vendors">
+            <Button variant="ghost" size="sm">Vendors</Button>
+          </Link>
           <Link href="/login">
             <Button variant="ghost" size="sm">Log In</Button>
           </Link>
