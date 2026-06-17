@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, MapPin, CheckCircle, ShieldAlert, Sparkles, Star, UserCheck, MessageSquare, ArrowLeft, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -96,8 +97,15 @@ export default function ChatPortal() {
       {/* Header bar */}
       <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <Link href="/" className="font-display text-2xl font-bold tracking-tight text-white flex items-center">
-            Need<span className="text-brand-blue flex items-center">Aura <Zap className="w-4 h-4 ml-1 fill-brand-orange text-brand-orange" /></span>
+          <Link href="/">
+            <Image
+              src="/logo.png"
+              alt="NeedAura Logo"
+              width={120}
+              height={36}
+              className="h-8 w-auto object-contain"
+              priority
+            />
           </Link>
         </div>
         <div className="flex items-center gap-4">

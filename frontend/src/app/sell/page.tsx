@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Upload, Cpu, ShieldCheck, HelpCircle, ArrowLeft, ArrowRight, Sparkles, AlertTriangle, Zap } from 'lucide-react';
@@ -97,13 +98,24 @@ export default function SellListing() {
 
       {/* Navigation Return Link */}
       <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
-        <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-mono">
-          <ArrowLeft className="w-4 h-4" /> Cancel & Return
-        </Link>
-        <span className="font-display text-lg font-bold text-white flex items-center">
-          Create Listing
-        </span>
-        <Badge variant="orange" glow>Ecosystem Active</Badge>
+        <div className="flex items-center gap-2">
+          <Link href="/">
+            <Image
+              src="/logo.png"
+              alt="NeedAura Logo"
+              width={120}
+              height={36}
+              className="h-8 w-auto object-contain"
+              priority
+            />
+          </Link>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-mono">
+            <ArrowLeft className="w-4 h-4" /> Cancel & Return
+          </Link>
+          <Badge variant="orange" glow>Ecosystem Active</Badge>
+        </div>
       </header>
 
       {/* Main Sell Layout */}

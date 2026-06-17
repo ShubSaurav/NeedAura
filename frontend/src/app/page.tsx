@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Sparkles, ArrowRight, ShieldCheck, Cpu, Zap, ShoppingBag, Eye, Users } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
@@ -44,10 +45,14 @@ export default function Home() {
       {/* Navigation Header */}
       <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          {/* Logo representation in text matching the logo theme */}
-          <span className="font-display text-2xl font-bold tracking-tight text-white flex items-center">
-            Need<span className="text-brand-blue flex items-center">Aura <Zap className="w-4 h-4 ml-1 fill-brand-orange text-brand-orange animate-pulse" /></span>
-          </span>
+          <Image
+            src="/logo.png"
+            alt="NeedAura Logo"
+            width={120}
+            height={36}
+            className="h-8 w-auto object-contain"
+            priority
+          />
         </div>
         <div className="flex items-center gap-4">
           <Link href="/login">

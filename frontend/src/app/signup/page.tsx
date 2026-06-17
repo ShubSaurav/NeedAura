@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { ShieldAlert, CheckCircle, ArrowLeft, ArrowRight, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
@@ -80,10 +81,15 @@ export default function Signup() {
       >
         <Card className="border-brand-blue/20">
           <CardHeader className="text-center">
-            <div className="flex justify-center mb-2">
-              <span className="font-display text-2xl font-bold tracking-tight text-white flex items-center">
-                Need<span className="text-brand-blue flex items-center">Aura <Zap className="w-4 h-4 ml-1 fill-brand-orange text-brand-orange" /></span>
-              </span>
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/logo.png"
+                alt="NeedAura Logo"
+                width={140}
+                height={42}
+                className="h-9 w-auto object-contain"
+                priority
+              />
             </div>
             <CardTitle className="text-3xl">Create Student Account</CardTitle>
             <CardDescription>Enter your official university email domain to join your campus ecosystem.</CardDescription>
