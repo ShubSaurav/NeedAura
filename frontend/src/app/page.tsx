@@ -58,6 +58,9 @@ export default function Home() {
           <Link href="/marketplace">
             <Button variant="ghost" size="sm">Marketplace</Button>
           </Link>
+          <Link href="/collaborate">
+            <Button variant="ghost" size="sm">Collaborate</Button>
+          </Link>
           <Link href="/login">
             <Button variant="ghost" size="sm">Log In</Button>
           </Link>
@@ -244,8 +247,13 @@ export default function Home() {
               <CardTitle>Complete Support Feed</CardTitle>
               <CardDescription>Beyond simple trading.</CardDescription>
             </CardHeader>
-            <CardContent>
-              Lost & Found portals, skill swaps, roommate matching, team finders, and local vendor pre-ordering all in one super app.
+            <CardContent className="space-y-3">
+              <p>
+                Lost & Found portals, skill swaps, roommate matching, team finders, and local vendor pre-ordering all in one super app.
+              </p>
+              <Link href="/collaborate" className="text-xs font-mono text-purple-400 hover:underline flex items-center gap-1">
+                Browse Collaboration <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
             </CardContent>
           </Card>
         </div>

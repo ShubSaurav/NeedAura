@@ -92,6 +92,12 @@ export default function NeedFeed() {
           </Link>
         </div>
         <div className="flex items-center gap-4">
+          <Link href="/marketplace">
+            <Button variant="ghost" size="sm">Marketplace</Button>
+          </Link>
+          <Link href="/collaborate">
+            <Button variant="ghost" size="sm">Collaborate</Button>
+          </Link>
           <Link href="/profile">
             <Button variant="ghost" size="sm">Dashboard</Button>
           </Link>
