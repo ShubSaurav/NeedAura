@@ -55,6 +55,9 @@ export default function Home() {
           />
         </div>
         <div className="flex items-center gap-4">
+          <Link href="/marketplace">
+            <Button variant="ghost" size="sm">Marketplace</Button>
+          </Link>
           <Link href="/login">
             <Button variant="ghost" size="sm">Log In</Button>
           </Link>
@@ -110,7 +113,12 @@ export default function Home() {
           >
             <Link href="/signup">
               <Button variant="primary" size="lg" glow className="gap-2">
-                Get Started <ArrowRight className="w-4 h-4" />
+                Join Ecosystem <ArrowRight className="w-4 h-4" />
+              </Button>
+            </Link>
+            <Link href="/marketplace">
+              <Button variant="ghost" size="lg" className="gap-2 border border-card-border hover:border-brand-blue/30">
+                Browse Marketplace
               </Button>
             </Link>
             <Button variant="secondary" size="lg" onClick={handleLensSimulation} className="gap-2">

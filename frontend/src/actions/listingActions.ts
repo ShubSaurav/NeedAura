@@ -49,3 +49,53 @@ export async function createListing(
     return { success: false, error: error.message };
   }
 }
+
+/**
+ * Server Action: Fetches active listings from the marketplace
+ */
+export async function fetchListings(filters: {
+  category?: string;
+  listingType?: string;
+  searchQuery?: string;
+} = {}): Promise<{ success: boolean; data: Listing[]; error?: string }> {
+  try {
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Retrieve user university_id if possible
+    let universityId = 'mock-university-uuid';
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('university_id')
+        .eq('id', user.id)
+        .single();
+      if (profile?.university_id) {
+        universityId = profile.university_id;
+      }
+    }
+
+    const listings = await ListingService.getListings(universityId, filters);
+    return { success: true, data: listings };
+  } catch (error: any) {
+    console.error('Error in fetchListings Server Action:', error);
+    return { success: false, data: [], error: error.message };
+  }
+}
+
+/**
+ * Server Action: Places a bid on an auction listing
+ */
+export async function placeBid(auctionId: string, amount: number): Promise<{ success: boolean; error?: string }> {
+  try {
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const activeUserId = user?.id || 'mock-current-student-uuid';
+
+    return await ListingService.placeAuctionBid(auctionId, activeUserId, amount);
+  } catch (error: any) {
+    console.error('Error in placeBid Server Action:', error);
+    return { success: false, error: error.message };
+  }
+}
+

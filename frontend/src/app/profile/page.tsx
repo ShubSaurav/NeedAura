@@ -70,7 +70,7 @@ export default function ProfileDashboard() {
           </Link>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/">
+          <Link href="/marketplace">
             <Button variant="ghost" size="sm">Marketplace</Button>
           </Link>
           <Badge variant="blue" glow>Active Session</Badge>
