@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Local PostgreSQL instance with pgvector extension enabled
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: needaura-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: needaura
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+
+  # Local Meilisearch instance for fast, intelligent search integrations
+  meilisearch:
+    image: getmeili/meilisearch:v1.5
+    container_name: needaura-meilisearch
+    ports:
+      - "7700:7700"
+    environment:
+      - MEILI_MASTER_KEY=meilisearchmasterkey
+      - MEILI_ENV=development
+    volumes:
+      - meilidata:/data.ms
+    restart: always
+
+volumes:
+  pgdata:
+  meilidata:

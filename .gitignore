@@ -1,0 +1,24 @@
+# Logs and build files
+node_modules/
+.next/
+dist/
+build/
+coverage/
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database / OS files
+.DS_Store
+*.log
+*.sqlite
+
+# Testing
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log*

@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-blue: #0066FF;
+  --color-brand-blue-hover: #0052cc;
+  --color-brand-orange: #FF7A00;
+  --color-brand-orange-hover: #e66e00;
+  
+  --color-bg-dark: #07090E;
+  --color-bg-darker: #040508;
+  --color-card-dark: rgba(13, 18, 30, 0.65);
+  --color-card-border: rgba(255, 255, 255, 0.08);
+  
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+
+  --animate-pulse-glow-blue: pulse-glow-blue 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-pulse-glow-orange: pulse-glow-orange 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+  @keyframes pulse-glow-blue {
+    0%, 100% { box-shadow: 0 0 15px rgba(0, 102, 255, 0.15); border-color: rgba(0, 102, 255, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(0, 102, 255, 0.35); border-color: rgba(0, 102, 255, 0.5); }
+  }
+  @keyframes pulse-glow-orange {
+    0%, 100% { box-shadow: 0 0 15px rgba(255, 122, 0, 0.15); border-color: rgba(255, 122, 0, 0.2); }
+    50% { box-shadow: 0 0 25px rgba(255, 122, 0, 0.35); border-color: rgba(255, 122, 0, 0.5); }
+  }
+}
+
+:root {
+  --background: #07090E;
+  --foreground: #F1F5F9;
+  --card: rgba(13, 18, 30, 0.65);
+  --border: rgba(255, 255, 255, 0.08);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism Styles */
+.glass-panel {
+  backdrop-filter: blur(12px) saturate(180%);
+  background-color: var(--card);
+  border: 1px solid var(--border);
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-panel-hover:hover {
+  background-color: rgba(20, 27, 45, 0.85);
+  border-color: rgba(0, 102, 255, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(0, 102, 255, 0.15);
+}
+
+/* Custom Cyberpunk Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #040508;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 102, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 102, 255, 0.6);
+}
+
+/* Dynamic glow effects */
+.glow-text-blue {
+  text-shadow: 0 0 10px rgba(0, 102, 255, 0.4);
+}
+
+.glow-text-orange {
+  text-shadow: 0 0 10px rgba(255, 122, 0, 0.4);
+}
+
+/* Linear-style border transitions */
+.linear-border {
+  position: relative;
+  border-radius: inherit;
+}
+
+.linear-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
