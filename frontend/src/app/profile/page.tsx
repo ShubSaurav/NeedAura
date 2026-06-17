@@ -136,6 +136,17 @@ export default function ProfileDashboard() {
                   <span>Joined {profile.memberSince}</span>
                 </div>
               </div>
+
+              <hr className="w-full border-card-border/50" />
+
+              {/* Moderator shortcut */}
+              <div className="w-full pt-1">
+                <Link href="/moderator" className="w-full block">
+                  <Button variant="ghost" size="sm" className="w-full text-xs font-mono text-slate-400 border border-card-border hover:text-white hover:border-brand-blue/30 gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-brand-blue" /> Moderator Dashboard
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
 
@@ -203,7 +214,7 @@ export default function ProfileDashboard() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-white font-display">Active Campus Listings</h3>
-              <Link href="/">
+              <Link href="/sell">
                 <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Create Listing</Button>
               </Link>
             </div>
