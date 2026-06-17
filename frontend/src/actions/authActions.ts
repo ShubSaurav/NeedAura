@@ -106,3 +106,33 @@ export async function verifyStudentID(userId: string, studentIdUrl: string): Pro
     return { success: false, error: error.message, autoVerified: false };
   }
 }
+
+/**
+ * Server Action: Fetches student ranking leaderboard
+ */
+export async function fetchLeaderboard(groupBy: 'university' | 'branch' | 'hostel' = 'university'): Promise<{ success: boolean; data: any[]; error?: string }> {
+  try {
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Default university ID
+    let universityId = 'mock-uni-id';
+    if (user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('university_id')
+        .eq('id', user.id)
+        .single();
+      if (profile?.university_id) {
+        universityId = profile.university_id;
+      }
+    }
+
+    const leaderboard = await UserService.getLeaderboard(universityId, groupBy);
+    return { success: true, data: leaderboard };
+  } catch (error: any) {
+    console.error('Error in fetchLeaderboard Server Action:', error);
+    return { success: false, data: [], error: error.message };
+  }
+}
+

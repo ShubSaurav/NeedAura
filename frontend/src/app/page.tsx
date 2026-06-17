@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Sparkles, ArrowRight, ShieldCheck, Cpu, Zap, ShoppingBag, Eye, Users } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Cpu, Zap, ShoppingBag, Eye, Users, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -228,8 +228,13 @@ export default function Home() {
               <CardTitle>Aura Scores & Badges</CardTitle>
               <CardDescription>Gamified campus trust.</CardDescription>
             </CardHeader>
-            <CardContent>
-              Earn points for donations, reviews, and helping in emergency SOS alerts. Unlocks leaderboard spots and Top Contributor badges.
+            <CardContent className="space-y-3">
+              <p>
+                Earn points for donations, reviews, and helping in emergency SOS alerts. Unlocks leaderboard spots and Top Contributor badges.
+              </p>
+              <Link href="/leaderboard" className="text-xs font-mono text-brand-orange hover:underline flex items-center gap-1">
+                View Campus Standings <ChevronRight className="w-3.5 h-3.5" />
+              </Link>
             </CardContent>
           </Card>
 
