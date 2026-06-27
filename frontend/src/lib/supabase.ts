@@ -4,6 +4,10 @@ import { createBrowserClient, createServerClient as createSupabaseServerClient }
 const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock-supabase.supabase.co').trim();
 const supabaseAnonKey = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'mock-anon-key').trim();
 
+if (typeof window !== 'undefined') {
+  console.log('[Supabase Init] Browser Client configured with URL:', supabaseUrl);
+}
+
 /**
  * Creates a Supabase client for use in browser components.
  */

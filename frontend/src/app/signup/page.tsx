@@ -89,9 +89,13 @@ export default function Signup() {
     setError(null);
     setIsLoading(true);
 
+    console.log('[Signup] handleSignup triggered. isRealSupabase =', isRealSupabase);
+    console.log('[Signup] Payload details:', { email, fullName, branch, hostel });
+
     if (isRealSupabase) {
       try {
         const supabase = createClient();
+        console.log('[Signup] Initiating supabase.auth.signUp...');
         const { data, error: signupError } = await supabase.auth.signUp({
           email,
           password,
@@ -103,6 +107,8 @@ export default function Signup() {
             }
           }
         });
+
+        console.log('[Signup] supabase.auth.signUp completed. Response:', { data, signupError });
 
         setIsLoading(false);
         if (signupError) {

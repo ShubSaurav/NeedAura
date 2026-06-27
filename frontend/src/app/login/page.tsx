@@ -58,13 +58,19 @@ export default function Login() {
     setIsLoading(true);
     setError(null);
 
+    console.log('[Login] handleLogin triggered. isRealSupabase =', isRealSupabase);
+    console.log('[Login] Attempting login with email:', email);
+
     if (isRealSupabase) {
       try {
         const supabase = createClient();
+        console.log('[Login] Initiating supabase.auth.signInWithPassword...');
         const { data, error: loginError } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
+
+        console.log('[Login] supabase.auth.signInWithPassword completed. Response:', { data, loginError });
 
         if (loginError) {
           setError(loginError.message);
