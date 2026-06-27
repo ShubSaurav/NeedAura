@@ -25,9 +25,10 @@ export async function GET(request: Request) {
             },
             setAll(cookiesToSet) {
               try {
-                cookiesToSet.forEach(({ name, value, options }) =>
-                  response.cookies.set(name, value, options)
-                );
+                cookiesToSet.forEach(({ name, value, options }) => {
+                  console.log(`[Auth Callback] Setting cookie: ${name}, options:`, options);
+                  response.cookies.set(name, value, options);
+                });
               } catch (err) {
                 console.error('[Auth Callback] Failed to set cookies on response:', err);
               }
