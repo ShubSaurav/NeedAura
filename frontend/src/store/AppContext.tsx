@@ -227,6 +227,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Sync session and retrieve profile
     const syncSession = async () => {
       try {
+        // Client-side OAuth code exchange check (fallback if redirected to home/marketplace directly)
+        if (typeof window !== 'undefined') {
+          const urlParams = new URLSearchParams(window.location.search);
+          const code = urlParams.get('code');
+          if (code) {
+            console.log('[AppContext] Client-side auth code found. Exchanging...');
+            const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+            if (!exchangeError) {
+              console.log('[AppContext] Client-side code exchange success!');
+              const newUrl = window.location.pathname + window.location.hash;
+              window.history.replaceState({}, document.title, newUrl);
+            } else {
+              console.error('[AppContext] Client-side code exchange error:', exchangeError.message);
+            }
+          }
+        }
+
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           const { data: profile } = await supabase
