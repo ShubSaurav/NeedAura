@@ -302,7 +302,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     syncSession();
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       try {
         if (session?.user) {
           const { data: profile } = await supabase

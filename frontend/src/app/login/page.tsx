@@ -82,7 +82,7 @@ export default function Login() {
           supabase.auth.signInWithPassword({
             email,
             password,
-          }).then(res => ({ data: res.data, loginError: res.error })),
+          }).then((res: any) => ({ data: res.data, loginError: res.error })),
           timeoutPromise
         ]) as any;
 
@@ -228,7 +228,7 @@ export default function Login() {
         const { error: googleError } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: `${window.location.origin}/auth/callback`,
+            redirectTo: `${window.location.origin}/marketplace`,
           }
         });
         if (googleError) {

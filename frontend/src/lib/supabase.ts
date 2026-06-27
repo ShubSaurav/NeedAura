@@ -8,11 +8,21 @@ if (typeof window !== 'undefined') {
   console.log('[Supabase Init] Browser Client configured with URL:', supabaseUrl);
 }
 
+let browserClient: ReturnType<typeof createBrowserClient> | undefined;
+
 /**
  * Creates a Supabase client for use in browser components.
  */
 export function createClient() {
-  return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  if (typeof window === 'undefined') {
+    return createBrowserClient(supabaseUrl, supabaseAnonKey);
+  }
+
+  if (!browserClient) {
+    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
+  }
+
+  return browserClient;
 }
 
 /**

@@ -120,7 +120,7 @@ export default function Signup() {
                 hostel: hostel || '',
               }
             }
-          }).then(res => ({ data: res.data, signupError: res.error })),
+          }).then((res: any) => ({ data: res.data, signupError: res.error })),
           timeoutPromise
         ]) as any;
 
@@ -276,7 +276,7 @@ export default function Signup() {
         const { error: googleError } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: `${window.location.origin}/auth/callback`,
+            redirectTo: `${window.location.origin}/marketplace`,
           }
         });
         if (googleError) {
