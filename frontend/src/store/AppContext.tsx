@@ -275,6 +275,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             const { error: insertError } = await supabase.from('profiles').insert(newProfile);
             if (insertError) {
               console.error('Failed to create user profile database row in syncSession:', insertError);
+              throw new Error(`[DB ERROR] Code: ${insertError.code}. Message: ${insertError.message}. Details: ${insertError.details}. Hint: ${insertError.hint}`);
             }
             setUserState(newProfile);
             localStorage.setItem('aura_user', JSON.stringify(newProfile));
@@ -333,6 +334,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             const { error: insertError } = await supabase.from('profiles').insert(newProfile);
             if (insertError) {
               console.error('Failed to create user profile database row in onAuthStateChange:', insertError);
+              throw new Error(`[DB ERROR] Code: ${insertError.code}. Message: ${insertError.message}. Details: ${insertError.details}. Hint: ${insertError.hint}`);
             }
             setUserState(newProfile);
             localStorage.setItem('aura_user', JSON.stringify(newProfile));
