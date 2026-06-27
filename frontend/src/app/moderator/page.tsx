@@ -1,4 +1,5 @@
 'use client';
+import Header from '@/components/Header';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -19,10 +20,10 @@ export default function ModeratorDashboard() {
   // ID Modal Detail view
   const [selectedID, setSelectedID] = useState<PendingVerification | null>(null);
 
-  // Audits logs mock
+  // Audits logs
   const [auditLogs, setAuditLogs] = useState<any[]>([
     { id: 'a1', admin: 'Shubham Saurav (Admin)', action: 'RESOLVE_REPORT', target: 'reports (rep-4)', timestamp: 'Recently', desc: 'Resolved scam report on fake note copies.' },
-    { id: 'a2', admin: 'System Trigger', action: 'AUTO_VERIFIED_STUDENT_ID', target: 'profiles (student-5)', timestamp: '1 hour ago', desc: 'Auto-verified CS student ID card using Gemini Vision OCR.' },
+    { id: 'a2', admin: 'System Trigger', action: 'AUTO_VERIFIED_STUDENT_ID', target: 'profiles (student-5)', timestamp: '1 hour ago', desc: 'Auto-verified CS student ID card using Aura Lens AI OCR.' },
     { id: 'a3', admin: 'Shubham Saurav (Admin)', action: 'APPROVE_STUDENT_ID', target: 'profiles (user-8)', timestamp: '3 hours ago', desc: 'Manually verified hostel student card for Block B.' }
   ]);
 
@@ -87,31 +88,7 @@ export default function ModeratorDashboard() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
       {/* Header navbar */}
-      <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="NeedAura Logo"
-              width={120}
-              height={36}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/marketplace">
-            <Button variant="ghost" size="sm">Marketplace</Button>
-          </Link>
-          <Link href="/collaborate">
-            <Button variant="ghost" size="sm">Collaborate</Button>
-          </Link>
-          <Link href="/profile">
-            <Button variant="ghost" size="sm">Dashboard</Button>
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Workspace Layout */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
@@ -352,7 +329,7 @@ export default function ModeratorDashboard() {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                  {/* Mock ID Card */}
+                  {/* Student ID Card Card Template */}
                   <div className="aspect-[1.6/1] w-full bg-slate-950 border border-card-border/60 rounded-xl relative flex flex-col justify-between p-4 overflow-hidden">
                     {/* Watermark glow */}
                     <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-brand-blue/10 blur-[40px] pointer-events-none" />
@@ -372,7 +349,7 @@ export default function ModeratorDashboard() {
                       <div className="space-y-1">
                         <span className="text-xs font-bold text-white block">{selectedID.fullName}</span>
                         <span className="text-[9px] text-slate-500 block font-mono">Branch: {selectedID.branch}</span>
-                        <span className="text-[9px] text-slate-500 block font-mono">ID: MOCK-ID-{selectedID.id.toUpperCase()}</span>
+                        <span className="text-[9px] text-slate-500 block font-mono">ID: CARD-{selectedID.id.toUpperCase()}</span>
                       </div>
                     </div>
 

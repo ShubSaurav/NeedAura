@@ -1,10 +1,11 @@
 'use client';
+import Header from '@/components/Header';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, MapPin, CheckCircle, ShieldAlert, Sparkles, Star, UserCheck, MessageSquare, ArrowLeft, Zap } from 'lucide-react';
+import { Send, MapPin, CheckCircle, ShieldAlert, Star, UserCheck, MessageSquare, ArrowLeft, Zap, Phone, Mic, MicOff, Volume2, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
@@ -24,12 +25,61 @@ export default function ChatPortal() {
   const [dealComment, setDealComment] = useState('');
   const [dealCompleted, setDealCompleted] = useState(false);
 
+  // Calling States
+  const [isCalling, setIsCalling] = useState(false);
+  const [callStatus, setCallStatus] = useState<'dialing' | 'ringing' | 'connected' | 'ended'>('dialing');
+  const [callDuration, setCallDuration] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isSpeaker, setIsSpeaker] = useState(false);
+
   // Quick Chat Suggestions (Gen-Z Fast Replies)
   const quickReplies = [
     'Is the price negotiable?',
     'Can we meet near the Library today?',
     'Deal! Let’s meet at the Student Center.',
   ];
+
+  // Call status timer effect
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isCalling && callStatus === 'connected') {
+      timer = setInterval(() => {
+        setCallDuration(prev => prev + 1);
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [isCalling, callStatus]);
+
+  // Simulate call connection progression
+  const handleStartCall = () => {
+    setIsCalling(true);
+    setCallStatus('dialing');
+    setCallDuration(0);
+    setIsMuted(false);
+    setIsSpeaker(false);
+
+    // After 1.5s, switch to Ringing
+    setTimeout(() => {
+      setCallStatus('ringing');
+      // After another 1.5s, automatically "answer" the call for demo
+      setTimeout(() => {
+        setCallStatus('connected');
+      }, 1500);
+    }, 1500);
+  };
+
+  const handleHangUp = () => {
+    setCallStatus('ended');
+    setTimeout(() => {
+      setIsCalling(false);
+    }, 1000);
+  };
+
+  const formatCallTime = (secs: number) => {
+    const mins = Math.floor(secs / 60);
+    const remainingSecs = secs % 60;
+    return `${mins}:${remainingSecs.toString().padStart(2, '0')}`;
+  };
 
   // Fetch threads on load
   useEffect(() => {
@@ -95,32 +145,7 @@ export default function ChatPortal() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
       {/* Header bar */}
-      <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="NeedAura Logo"
-              width={120}
-              height={36}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/marketplace">
-            <Button variant="ghost" size="sm">Marketplace</Button>
-          </Link>
-          <Link href="/collaborate">
-            <Button variant="ghost" size="sm">Collaborate</Button>
-          </Link>
-          <Link href="/profile">
-            <Button variant="ghost" size="sm">Dashboard</Button>
-          </Link>
-          <Badge variant="blue" glow>1 New Message</Badge>
-        </div>
-      </header>
+      <Header />
 
       {/* Split Window Workspace */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-6 flex gap-6 relative z-10 overflow-hidden h-[calc(100vh-90px)]">
@@ -165,9 +190,15 @@ export default function ChatPortal() {
                     <span>Pickup Zone: Library Entrance</span>
                   </div>
                 </div>
-                <Button variant="accent" size="sm" onClick={() => setIsDealModalOpen(true)} className="gap-1.5 font-semibold">
-                  <UserCheck className="w-4 h-4" /> Complete Deal
-                </Button>
+                
+                <div className="flex gap-2">
+                  <Button variant="secondary" size="sm" onClick={handleStartCall} className="gap-1.5 font-semibold text-xs hover:border-brand-blue/40">
+                    <Phone className="w-3.5 h-3.5 text-brand-blue" /> Voice Call
+                  </Button>
+                  <Button variant="accent" size="sm" onClick={() => setIsDealModalOpen(true)} className="gap-1.5 font-semibold text-xs">
+                    <UserCheck className="w-3.5 h-3.5" /> Complete Deal
+                  </Button>
+                </div>
               </div>
 
               {/* Message History Feed */}
@@ -251,8 +282,8 @@ export default function ChatPortal() {
             >
               <Card className="border-brand-orange/30">
                 <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-1.5">
-                    <Sparkles className="w-5 h-5 text-brand-orange" /> Complete Transaction
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    <img src="/logo.png" alt="Logo" className="w-5 h-auto object-contain shrink-0" /> Complete Transaction
                   </CardTitle>
                   <CardDescription>Confirming this deal updates transaction logs and recalculates Aura scores.</CardDescription>
                 </CardHeader>
@@ -303,6 +334,118 @@ export default function ChatPortal() {
                   )}
                 </CardContent>
               </Card>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Voice Call Simulation Overlay */}
+      <AnimatePresence>
+        {isCalling && (
+          <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="w-full max-w-sm text-center bg-card-dark border border-brand-blue/30 rounded-3xl p-8 relative overflow-hidden shadow-2xl"
+            >
+              {/* Decorative wave rings */}
+              {callStatus !== 'ended' && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                  <div className="w-48 h-48 rounded-full border border-brand-blue animate-ping" style={{ animationDuration: '3s' }} />
+                  <div className="w-72 h-72 rounded-full border border-brand-blue animate-ping" style={{ animationDuration: '4s' }} />
+                </div>
+              )}
+
+              {/* Status Badge */}
+              <div className="flex justify-center mb-4">
+                <Badge variant={callStatus === 'connected' ? 'green' : 'blue'} glow>
+                  {callStatus.toUpperCase()}
+                </Badge>
+              </div>
+
+              {/* Call target avatar */}
+              <div className="relative w-28 h-28 mx-auto rounded-full bg-slate-950 border-2 border-brand-blue/40 flex items-center justify-center mb-6">
+                <div className="text-3xl font-bold font-display text-brand-blue">
+                  {selectedThread?.otherParticipantName ? selectedThread.otherParticipantName.split(' ').map((n: string) => n[0]).join('') : 'C'}
+                </div>
+              </div>
+
+              {/* Target Name */}
+              <h3 className="text-2xl font-bold text-white font-display mb-1">{selectedThread?.otherParticipantName}</h3>
+              <p className="text-xs font-mono text-slate-500 mb-4">
+                {callStatus === 'dialing' && 'Connecting to secure line...'}
+                {callStatus === 'ringing' && 'Ringing...'}
+                {callStatus === 'connected' && `Call Active • ${formatCallTime(callDuration)}`}
+                {callStatus === 'ended' && 'Call ended'}
+              </p>
+
+              {/* Waveform Visualization (when connected) */}
+              {callStatus === 'connected' ? (
+                <div className="flex justify-center items-center gap-1.5 h-12 mb-8">
+                  {[...Array(12)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-1 bg-brand-blue rounded-full shadow-[0_0_8px_rgba(0,102,255,0.6)]"
+                      animate={{
+                        height: [8, 36, 8],
+                      }}
+                      transition={{
+                        duration: 0.8 + (i % 3) * 0.2,
+                        repeat: Infinity,
+                        delay: i * 0.05,
+                        ease: "easeInOut"
+                      }}
+                      style={{
+                        minHeight: '6px'
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="h-12 mb-8" />
+              )}
+
+              {/* Controls bar */}
+              <div className="flex justify-center gap-6 mb-8">
+                {/* Mute button */}
+                <button
+                  onClick={() => setIsMuted(!isMuted)}
+                  className={`p-4 rounded-full border transition-all ${
+                    isMuted
+                      ? 'bg-brand-orange border-brand-orange text-slate-950'
+                      : 'bg-slate-900 border-card-border text-slate-400 hover:text-white hover:border-slate-700'
+                  }`}
+                  disabled={callStatus === 'ended'}
+                >
+                  {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                </button>
+
+                {/* Speaker button */}
+                <button
+                  onClick={() => setIsSpeaker(!isSpeaker)}
+                  className={`p-4 rounded-full border transition-all ${
+                    isSpeaker
+                      ? 'bg-brand-blue border-brand-blue text-slate-950'
+                      : 'bg-slate-900 border-card-border text-slate-400 hover:text-white hover:border-slate-700'
+                  }`}
+                  disabled={callStatus === 'ended'}
+                >
+                  {isSpeaker ? <Volume2 className="w-5 h-5" /> : <Volume2 className="w-5 h-5 opacity-60" />}
+                </button>
+              </div>
+
+              {/* Hang Up trigger */}
+              <div className="flex justify-center">
+                <button
+                  onClick={handleHangUp}
+                  className="w-14 h-14 rounded-full bg-rose-600 hover:bg-rose-500 text-white flex items-center justify-center shadow-lg shadow-rose-900/40 hover:scale-105 transition-all"
+                  title="Hang Up"
+                >
+                  <Phone className="w-6 h-6 rotate-[135deg]" />
+                </button>
+              </div>
+
             </motion.div>
           </div>
         )}

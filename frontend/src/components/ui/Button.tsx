@@ -20,11 +20,11 @@ export function Button({
 }: ButtonProps) {
   // Styles based on variant
   const variantStyles = {
-    primary: 'bg-brand-blue text-white hover:bg-brand-blue-hover border-transparent',
-    secondary: 'bg-card-dark text-slate-200 border-card-border hover:border-brand-blue/40 hover:bg-slate-900/40',
-    accent: 'bg-brand-orange text-white hover:bg-brand-orange-hover border-transparent',
-    danger: 'bg-red-600/20 text-red-200 border-red-500/30 hover:bg-red-600/30 hover:border-red-500/50',
-    ghost: 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-slate-900/30',
+    primary: 'bg-brand-blue text-slate-950 hover:bg-brand-blue-hover border-transparent',
+    secondary: 'bg-slate-900/60 text-slate-200 border-card-border hover:border-brand-blue/40 hover:bg-slate-800/60',
+    accent: 'bg-brand-orange text-slate-950 hover:bg-brand-orange-hover border-transparent',
+    danger: 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100',
+    ghost: 'bg-transparent text-slate-400 border-transparent hover:text-slate-100 hover:bg-slate-900/30',
   };
 
   // Styles based on size

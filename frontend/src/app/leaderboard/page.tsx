@@ -1,10 +1,11 @@
 'use client';
+import Header from '@/components/Header';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ShieldCheck, Award, Zap, Trophy, Heart, Sparkles, Building, Bookmark, Users, ChevronRight } from 'lucide-react';
+import { ShieldCheck, Award, Zap, Trophy, Heart, Building, Bookmark, Users, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -52,34 +53,7 @@ export default function LeaderboardPage() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
       {/* Header navbar */}
-      <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="NeedAura Logo"
-              width={120}
-              height={36}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/marketplace">
-            <Button variant="ghost" size="sm">Marketplace</Button>
-          </Link>
-          <Link href="/needs">
-            <Button variant="ghost" size="sm">Needs Feed</Button>
-          </Link>
-          <Link href="/collaborate">
-            <Button variant="ghost" size="sm">Collaborate</Button>
-          </Link>
-          <Link href="/profile">
-            <Button variant="ghost" size="sm">Dashboard</Button>
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Workspace Layout */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
@@ -263,7 +237,7 @@ export default function LeaderboardPage() {
                 </div>
               </div>
               <div className="flex gap-3 items-start border-t border-card-border/20 pt-3">
-                <Sparkles className="w-8 h-8 text-purple-400 shrink-0 mt-0.5" />
+                <img src="/logo.png" alt="Campus Helper" className="w-8 h-8 shrink-0 mt-0.5 object-contain" />
                 <div>
                   <span className="font-bold text-white text-xs font-display">Campus Helper</span>
                   <p className="text-slate-500 text-[11px] leading-relaxed mt-0.5">Unlocks by responding to 3 or more SOS needs listed by peers.</p>

@@ -1,10 +1,11 @@
 'use client';
+import Header from '@/components/Header';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, MessageSquare, Plus, Search, Tag, AlertCircle, CheckCircle, Cpu, Zap, ArrowLeft } from 'lucide-react';
+import { MessageSquare, Plus, Search, Tag, AlertCircle, CheckCircle, Cpu, Zap, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
@@ -78,34 +79,7 @@ export default function NeedFeed() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
       {/* Header bar */}
-      <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="NeedAura Logo"
-              width={120}
-              height={36}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/marketplace">
-            <Button variant="ghost" size="sm">Marketplace</Button>
-          </Link>
-          <Link href="/collaborate">
-            <Button variant="ghost" size="sm">Collaborate</Button>
-          </Link>
-          <Link href="/profile">
-            <Button variant="ghost" size="sm">Dashboard</Button>
-          </Link>
-          <Button variant="primary" size="sm" onClick={() => setIsPostModalOpen(true)} className="gap-1.5 font-semibold" glow>
-            <Plus className="w-4 h-4" /> Request Something
-          </Button>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Needs Feed Layout */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8 relative z-10">
@@ -211,8 +185,8 @@ export default function NeedFeed() {
                   {!loadingMatches[need.id] && matchingResults[need.id] && (
                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="space-y-3">
                       <div className="p-4 bg-slate-950/60 rounded-lg border border-brand-blue/15 space-y-2">
-                        <div className="flex items-center gap-1.5 text-xs text-brand-blue font-mono uppercase tracking-wider">
-                          <Sparkles className="w-3.5 h-3.5" /> AI Match Engine Results
+                        <div className="flex items-center gap-2 text-xs text-brand-blue font-mono uppercase tracking-wider">
+                          <img src="/logo.png" alt="Logo" className="w-3.5 h-auto object-contain shrink-0" /> AI Match Engine Results
                         </div>
                         
                         {matchingResults[need.id].length > 0 ? (
@@ -247,11 +221,25 @@ export default function NeedFeed() {
             ))}
 
             {needs.length === 0 && (
-              <div className="border border-dashed border-card-border rounded-xl p-12 text-center bg-slate-900/10 flex flex-col items-center justify-center">
-                <AlertCircle className="w-10 h-10 text-slate-700 mb-3" />
-                <h4 className="font-bold text-slate-300">No requests found</h4>
-                <p className="text-sm text-slate-500 max-w-sm mx-auto mt-1">
-                  There are no active need requests in this category. Click "Request Something" to share what you are looking for.
+              <div className="border border-dashed border-card-border rounded-2xl p-16 text-center bg-slate-950/20 flex flex-col items-center justify-center space-y-4">
+                <div className="w-32 h-32 relative flex items-center justify-center mb-2">
+                  <div className="absolute inset-0 rounded-full bg-brand-orange/5 animate-pulse" />
+                  <div className="absolute inset-4 rounded-full border border-brand-orange/10" />
+                  
+                  <svg className="w-20 h-20 text-slate-700 relative z-10" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    {/* Megaphone / Announcement illustration */}
+                    <path d="M35 55 L35 75 L45 75 L45 60" className="text-slate-800" />
+                    <path d="M25 40 C25 25, 45 25, 55 30 L80 40 L80 50 L55 60 C45 65, 25 55, 25 40 Z" strokeWidth="2.5" />
+                    <path d="M80 40 C85 40, 90 42, 90 45 C90 48, 85 50, 80 50" />
+                    
+                    {/* Soundwaves representing active request shoutouts */}
+                    <path d="M55 25 C62 18, 72 18, 78 22" className="text-brand-orange animate-pulse" strokeWidth="1.5" />
+                    <path d="M62 65 C68 70, 78 68, 82 62" className="text-brand-orange animate-pulse" strokeWidth="1.5" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-slate-300 text-lg font-display">No Needs Posted Yet</h4>
+                <p className="text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
+                  There are no active student request shoutouts in this category. Click the post button to share your requirements.
                 </p>
               </div>
             )}

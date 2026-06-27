@@ -35,6 +35,10 @@ export interface Profile {
   avatar_url?: string;
   is_verified: boolean;
   student_id_url?: string;
+  phone_number?: string;
+  aadhaar_no?: string;
+  is_aadhaar_verified?: boolean;
+  onboarding_completed?: boolean;
   created_at: string;
   updated_at: string;
   deleted_at?: string;
@@ -55,6 +59,7 @@ export interface Listing {
   pickup_zone: string;
   status: ListingStatus;
   visibility: VisibilityType;
+  is_pinned?: boolean;
   created_at: string;
   updated_at: string;
   deleted_at?: string;

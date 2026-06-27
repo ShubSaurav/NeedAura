@@ -15,54 +15,76 @@ export class ListingService {
     try {
       const supabase = await createServerClient();
       
-      // Insert main listing
-      const { data: listing, error: listingError } = await supabase
-        .from('listings')
-        .insert({
-          seller_id: sellerId,
-          title: data.title,
-          description: data.description,
-          price: data.price,
-          suggested_price: data.suggested_price,
-          market_price: data.market_price,
-          category: data.category,
-          condition_score: data.condition_score,
-          image_urls: data.image_urls,
-          listing_type: data.listing_type,
-          pickup_zone: data.pickup_zone,
-          visibility: data.visibility,
-          status: 'active',
-        })
-        .select()
-        .single();
-
-      if (listingError || !listing) {
-        throw new Error(listingError?.message || 'Failed to create listing');
+      // Retrieve currently logged-in user
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('You must be logged in to create a listing.');
       }
 
-      // If listing type is auction, create the auction record
-      if (data.listing_type === 'auction' && data.auctionStartPrice && data.auctionEndTime) {
-        const { error: auctionError } = await supabase
-          .from('auctions')
-          .insert({
-            listing_id: listing.id,
-            start_price: data.auctionStartPrice,
-            current_price: data.auctionStartPrice,
-            end_time: data.auctionEndTime,
-          });
-
-        if (auctionError) {
-          // Rollback listing if auction fails
-          await supabase.from('listings').delete().eq('id', listing.id);
-          throw new Error(auctionError.message);
-        }
-      }
-
-      return { success: true, listingId: listing.id };
+      const result = await ListingService.createListingInDb(user.id, data);
+      return result;
     } catch (error: any) {
       console.error('Error in createListing:', error);
       return { success: false, error: error.message };
     }
+  }
+
+  /**
+   * Internal DB insertion for listing
+   */
+  private static async createListingInDb(
+    sellerId: string,
+    data: Omit<Listing, 'id' | 'seller_id' | 'status' | 'created_at' | 'updated_at'> & {
+      auctionStartPrice?: number;
+      auctionEndTime?: string;
+    }
+  ): Promise<{ success: boolean; listingId?: string; error?: string }> {
+    const supabase = await createServerClient();
+    
+    // Insert main listing
+    const { data: listing, error: listingError } = await supabase
+      .from('listings')
+      .insert({
+        seller_id: sellerId,
+        title: data.title,
+        description: data.description,
+        price: data.price,
+        suggested_price: data.suggested_price,
+        market_price: data.market_price,
+        category: data.category,
+        condition_score: data.condition_score,
+        image_urls: data.image_urls,
+        listing_type: data.listing_type,
+        pickup_zone: data.pickup_zone,
+        visibility: data.visibility,
+        status: 'active',
+      })
+      .select()
+      .single();
+
+    if (listingError || !listing) {
+      throw new Error(listingError?.message || 'Failed to create listing');
+    }
+
+    // If listing type is auction, create the auction record
+    if (data.listing_type === 'auction' && data.auctionStartPrice && data.auctionEndTime) {
+      const { error: auctionError } = await supabase
+        .from('auctions')
+        .insert({
+          listing_id: listing.id,
+          start_price: data.auctionStartPrice,
+          current_price: data.auctionStartPrice,
+          end_time: data.auctionEndTime,
+        });
+
+      if (auctionError) {
+        // Rollback listing if auction fails
+        await supabase.from('listings').delete().eq('id', listing.id);
+        throw new Error(auctionError.message);
+      }
+    }
+
+    return { success: true, listingId: listing.id };
   }
 
   /**
@@ -96,20 +118,10 @@ export class ListingService {
         query = query.eq('listing_type', filters.listingType);
       }
 
-      // Apply University Isolation & Visibility policies
-      // In Supabase, RLS policies will enforce this automatically.
-      // But we double-check and filter explicitly as well.
-      if (userUniversityId) {
-        // Only select items belonging to user's university or public items
-        // RLS does this, but for explicit query:
-        // We fetch sellers in the same university.
-        // For simplicity in client queries, we let RLS handle it,
-        // or filter by university if requested.
-      }
-
-      // Full Text Search on PostgreSQL
+      // Simple and robust search using .or filter to avoid missing generated columns
       if (filters.searchQuery) {
-        query = query.textSearch('title_description_search', filters.searchQuery);
+        const queryStr = `%${filters.searchQuery}%`;
+        query = query.or(`title.ilike.${queryStr},description.ilike.${queryStr}`);
       }
 
       const { data, error } = await query.order('created_at', { ascending: false });
@@ -117,47 +129,8 @@ export class ListingService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error in getListings, returning mock data:', error);
-      
-      // Fallback mock listings for development
-      return [
-        {
-          id: '1',
-          seller_id: 'mock-seller-1',
-          title: 'Casio Scientific Calculator fx-991EX',
-          description: 'Used for two semesters in engineering. Excellent condition, no scratches.',
-          price: 550.00,
-          suggested_price: 600.00,
-          market_price: 1200.00,
-          category: 'Electronics',
-          condition_score: 95,
-          image_urls: ['/mock-calculator.jpg'],
-          listing_type: 'sell',
-          pickup_zone: 'Library Entrance',
-          status: 'active',
-          visibility: 'campus',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          seller_id: 'mock-seller-2',
-          title: 'DBMS Textbook - Korth 6th Edition',
-          description: 'Required textbook for CS branch. Giving away for free to juniors!',
-          price: 0.00,
-          suggested_price: 0.00,
-          market_price: 750.00,
-          category: 'Books',
-          condition_score: 80,
-          image_urls: ['/mock-book.jpg'],
-          listing_type: 'donate',
-          pickup_zone: 'Student Center Cafeteria',
-          status: 'active',
-          visibility: 'campus',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ];
+      console.error('Error in getListings:', error);
+      return [];
     }
   }
 

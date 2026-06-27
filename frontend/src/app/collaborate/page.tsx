@@ -1,10 +1,11 @@
 'use client';
+import Header from '@/components/Header';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Users, Plus, Award, MessageSquare, Briefcase, Zap, HelpCircle, Code, Palette, Search, X } from 'lucide-react';
+import { Users, Plus, Award, MessageSquare, Briefcase, Zap, HelpCircle, Code, Palette, Search, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
@@ -88,43 +89,7 @@ export default function CollaborateHub() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
       {/* Header bar */}
-      <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="NeedAura Logo"
-              width={120}
-              height={36}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/marketplace">
-            <Button variant="ghost" size="sm">Marketplace</Button>
-          </Link>
-          <Link href="/needs">
-            <Button variant="ghost" size="sm">Needs Feed</Button>
-          </Link>
-          <Link href="/collaborate">
-            <Button variant="ghost" size="sm">Collaborate</Button>
-          </Link>
-          <Link href="/vendors">
-            <Button variant="ghost" size="sm">Vendors</Button>
-          </Link>
-          <Link href="/leaderboard">
-            <Button variant="ghost" size="sm">Leaderboard</Button>
-          </Link>
-          <Link href="/profile">
-            <Button variant="ghost" size="sm">Dashboard</Button>
-          </Link>
-          <Button variant="primary" size="sm" onClick={() => setIsPostModalOpen(true)} className="gap-1.5 font-semibold" glow>
-            <Plus className="w-4 h-4" /> Post Collaboration
-          </Button>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Workspace grid */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8 relative z-10">

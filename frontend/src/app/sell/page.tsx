@@ -1,19 +1,23 @@
 'use client';
+import Header from '@/components/Header';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Upload, Cpu, ShieldCheck, HelpCircle, ArrowLeft, ArrowRight, Sparkles, AlertTriangle, Zap } from 'lucide-react';
+import { Upload, Cpu, ShieldCheck, HelpCircle, ArrowLeft, ArrowRight, AlertTriangle, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
-import { analyzeListingImage, createListing } from '@/actions/listingActions';
+import { analyzeListingImage } from '@/actions/listingActions';
+import { useApp, translations } from '@/store/AppContext';
 
 export default function SellListing() {
   const router = useRouter();
+  const { user, addListing, language } = useApp();
+  const t = translations[language];
   
   // Form States
   const [title, setTitle] = useState('');
@@ -24,7 +28,7 @@ export default function SellListing() {
   const [category, setCategory] = useState('Others');
   const [conditionScore, setConditionScore] = useState(80);
   const [listingType, setListingType] = useState<'sell' | 'donate' | 'rent' | 'exchange' | 'auction'>('sell');
-  const [pickupZone, setPickupZone] = useState('Library');
+  const [pickupZone, setPickupZone] = useState('Library Entrance');
   const [visibility, setVisibility] = useState<'campus' | 'network' | 'public'>('campus');
   
   // Auction specific states
@@ -37,7 +41,7 @@ export default function SellListing() {
   const [scamConfidence, setScamConfidence] = useState<'low' | 'medium' | 'high'>('low');
   const [scanningLogs, setScanningLogs] = useState<string[]>([]);
 
-  // Trigger Gemini Vision Visual Scan
+  // Trigger Aura Lens AI Valuation Scan
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -86,7 +90,10 @@ export default function SellListing() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const result = await createListing({
+    if (!user) return;
+
+    addListing({
+      seller_id: user.id,
       title,
       description,
       price: parseFloat(price) || 0,
@@ -95,17 +102,17 @@ export default function SellListing() {
       category,
       condition_score: conditionScore,
       image_urls: uploadedImage ? [uploadedImage] : [],
-      listing_type: listingType === 'rent' ? 'rent' : listingType, // mapping rent/borrow
+      listing_type: listingType,
       pickup_zone: pickupZone,
+      status: 'active',
       visibility,
-      auctionStartPrice: listingType === 'auction' ? parseFloat(price) : undefined,
-      auctionEndTime: listingType === 'auction' ? auctionEndTime : undefined,
+      is_pinned: false
     });
 
-    if (result.success) {
-      router.push('/profile');
-    }
+    router.push('/marketplace');
   };
+
+
 
   return (
     <div className="min-h-screen bg-bg-dark text-slate-100 flex flex-col relative overflow-hidden">
@@ -113,26 +120,7 @@ export default function SellListing() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
       {/* Navigation Return Link */}
-      <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="NeedAura Logo"
-              width={120}
-              height={36}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/marketplace" className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-mono">
-            <ArrowLeft className="w-4 h-4" /> Cancel & Return
-          </Link>
-          <Badge variant="orange" glow>Ecosystem Active</Badge>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Sell Layout */}
       <main className="flex-1 w-full max-w-5xl mx-auto px-6 py-12 relative z-10 grid grid-cols-1 md:grid-cols-12 gap-8">
@@ -144,14 +132,14 @@ export default function SellListing() {
               <CardTitle className="text-base flex items-center gap-1.5">
                 <Upload className="w-4 h-4 text-brand-blue" /> Upload Product Image
               </CardTitle>
-              <CardDescription>Drag and drop a photo to let Gemini Vision categorize, describe, and value your item automatically.</CardDescription>
+              <CardDescription>Drag and drop a photo to let Aura Lens AI categorize, describe, and value your item automatically.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="relative aspect-square rounded-xl border border-dashed border-card-border bg-slate-950/50 flex flex-col items-center justify-center p-6 text-center hover:border-brand-blue/50 transition-all duration-300">
                 {uploadedImage ? (
                   <div className="absolute inset-0 p-2">
                     <div className="relative w-full h-full rounded-lg overflow-hidden flex items-center justify-center bg-slate-900">
-                      <ShoppingBagIcon className="w-16 h-16 text-slate-800" />
+                      <img src={uploadedImage} alt="Uploaded product" className="w-full h-full object-cover" />
                       
                       {/* Scanning vertical line animation */}
                       {isAnalyzing && (
@@ -166,7 +154,7 @@ export default function SellListing() {
                         <div className="absolute inset-0 bg-slate-950/90 flex flex-col items-start justify-end p-4 space-y-2 overflow-hidden">
                           <div className="flex items-center gap-2 mb-auto mt-2">
                             <div className="w-4 h-4 border-2 border-brand-blue border-t-transparent rounded-full animate-spin" />
-                            <span className="text-xs text-brand-blue font-mono uppercase tracking-wider animate-pulse">Gemini Scanning...</span>
+                            <span className="text-xs text-brand-blue font-mono uppercase tracking-wider animate-pulse">Aura Lens Scanning...</span>
                           </div>
                           
                           {/* Live Log Feeds */}
@@ -211,7 +199,7 @@ export default function SellListing() {
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-3">
                   <div className="p-4 bg-slate-950/60 rounded-lg border border-card-border space-y-4">
                     <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
-                      <span>Google Lens Resale Index</span>
+                      <span>Aura Lens AI Resale Index</span>
                       <span className="text-emerald-400 flex items-center gap-1">
                         <ShieldCheck className="w-3.5 h-3.5 fill-emerald-500/10 text-emerald-400" /> Scam Check: passed
                       </span>
@@ -222,11 +210,16 @@ export default function SellListing() {
                       {/* Suggested price bar */}
                       <div className="space-y-1">
                         <div className="flex justify-between text-xs font-mono">
-                          <span className="text-slate-400">Gemini Suggested (Used):</span>
+                          <span className="text-slate-400">Aura AI Suggested (Used):</span>
                           <span className="font-bold text-brand-orange">₹{suggestedPrice}</span>
                         </div>
                         <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-card-border/30">
-                          <div className="bg-brand-orange h-full rounded-full" style={{ width: '45%' }} />
+                          <motion.div
+                            className="bg-brand-orange h-full rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: '45%' }}
+                            transition={{ duration: 1, ease: 'easeOut' }}
+                          />
                         </div>
                       </div>
 
@@ -237,7 +230,12 @@ export default function SellListing() {
                           <span className="font-bold text-slate-300">₹{Math.round(suggestedPrice * 1.15)}</span>
                         </div>
                         <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-card-border/30">
-                          <div className="bg-brand-blue h-full rounded-full" style={{ width: '55%' }} />
+                          <motion.div
+                            className="bg-brand-blue h-full rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: '55%' }}
+                            transition={{ duration: 1, ease: 'easeOut' }}
+                          />
                         </div>
                       </div>
 
@@ -249,14 +247,19 @@ export default function SellListing() {
                             <span className="font-bold text-slate-500">₹{marketPrice}</span>
                           </div>
                           <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-card-border/30">
-                            <div className="bg-slate-700 h-full rounded-full" style={{ width: '100%' }} />
+                            <motion.div
+                              className="bg-slate-700 h-full rounded-full"
+                              initial={{ width: 0 }}
+                              animate={{ width: '100%' }}
+                              transition={{ duration: 1, ease: 'easeOut' }}
+                            />
                           </div>
                         </div>
                       )}
                     </div>
 
                     <div className="pt-2 border-t border-card-border/30 text-xs text-slate-400 leading-relaxed font-sans">
-                      Click below to auto-fill the listing price with Gemini's suggestion:
+                      Click below to auto-fill the listing price with Aura's suggestion:
                     </div>
 
                     <Button 
@@ -422,8 +425,8 @@ export default function SellListing() {
                   </div>
                 </div>
 
-                <Button type="submit" variant="primary" glow className="w-full py-3.5 text-sm font-semibold">
-                  Publish Listing <Sparkles className="w-4 h-4 ml-1.5 fill-white" />
+                <Button type="submit" variant="primary" glow className="w-full py-3.5 text-sm font-semibold flex items-center justify-center gap-1.5">
+                  Publish Listing <img src="/logo.png" alt="Logo" className="w-4.5 h-auto object-contain inline" />
                 </Button>
 
               </CardContent>

@@ -14,12 +14,12 @@ export function Badge({
 }: BadgeProps) {
   // Styles mapping
   const variantStyles = {
-    blue: 'bg-brand-blue/10 text-brand-blue border-brand-blue/30',
-    orange: 'bg-brand-orange/10 text-brand-orange border-brand-orange/30',
-    green: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
-    red: 'bg-rose-500/10 text-rose-400 border-rose-500/25',
-    purple: 'bg-purple-500/10 text-purple-400 border-purple-500/25',
-    slate: 'bg-slate-800/40 text-slate-300 border-slate-700/50',
+    blue: 'bg-brand-blue/10 text-brand-blue border-brand-blue/20',
+    orange: 'bg-brand-orange/10 text-brand-orange border-brand-orange/20',
+    green: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+    red: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+    purple: 'bg-purple-500/10 text-purple-600 border-purple-500/20',
+    slate: 'bg-slate-900/60 text-slate-300 border-card-border',
   };
 
   const glowStyles = glow

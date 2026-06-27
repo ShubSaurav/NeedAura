@@ -1,4 +1,5 @@
 'use client';
+import Header from '@/components/Header';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -100,40 +101,7 @@ export default function VendorPortal() {
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
       {/* Header navbar */}
-      <header className="w-full max-w-7xl mx-auto px-6 py-5 flex items-center justify-between border-b border-card-border/40 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <Link href="/">
-            <Image
-              src="/logo.png"
-              alt="NeedAura Logo"
-              width={120}
-              height={36}
-              className="h-8 w-auto object-contain"
-              priority
-            />
-          </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <Link href="/marketplace">
-            <Button variant="ghost" size="sm">Marketplace</Button>
-          </Link>
-          <Link href="/collaborate">
-            <Button variant="ghost" size="sm">Collaborate</Button>
-          </Link>
-          <Link href="/profile">
-            <Button variant="ghost" size="sm">Dashboard</Button>
-          </Link>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsOwnerMode(!isOwnerMode)}
-            className={`gap-1.5 font-mono text-xs ${isOwnerMode ? 'border-brand-orange text-brand-orange bg-brand-orange/5' : ''}`}
-          >
-            <Edit className="w-3.5 h-3.5" />
-            {isOwnerMode ? 'Store Owner Mode' : 'Switch Owner Mode'}
-          </Button>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Workspace grid */}
       <main className="flex-1 w-full max-w-7xl mx-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8 relative z-10">

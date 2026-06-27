@@ -17,25 +17,8 @@ export class UserService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error('Error fetching profile, returning mock profile:', error);
-      
-      // Fallback mock profile for development
-      return {
-        id: userId,
-        full_name: 'Shubham Saurav',
-        email: 'shubham.s@chitkara.edu.in',
-        university_id: 'mock-uni-id',
-        branch: 'Computer Science',
-        hostel: 'Block A, Room 302',
-        role: 'student',
-        aura_score: 120,
-        aura_points: 350,
-        avatar_url: '/mock-avatar.png',
-        is_verified: true,
-        student_id_url: '/mock-id.jpg',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
+      console.error('Error fetching profile:', error);
+      return null;
     }
   }
 
@@ -80,39 +63,8 @@ export class UserService {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.error('Error fetching leaderboard, returning mock ranking:', error);
-      
-      // Fallback mock leaderboard
-      return [
-        {
-          id: '1',
-          full_name: 'Aarav Sharma',
-          email: 'aarav@cuchd.in',
-          university_id: 'mock-uni-id',
-          branch: 'CSE',
-          hostel: 'Block B',
-          role: 'student',
-          aura_score: 340,
-          aura_points: 1200,
-          is_verified: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        },
-        {
-          id: '2',
-          full_name: 'Shubham Saurav',
-          email: 'shubham.s@chitkara.edu.in',
-          university_id: 'mock-uni-id',
-          branch: 'Computer Science',
-          hostel: 'Block A',
-          role: 'student',
-          aura_score: 120,
-          aura_points: 350,
-          is_verified: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ];
+      console.error('Error fetching leaderboard:', error);
+      return [];
     }
   }
 
