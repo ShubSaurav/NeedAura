@@ -108,7 +108,25 @@ export default function Signup() {
         if (signupError) {
           setError(signupError.message);
         } else {
-          setIsRegistered(true);
+          if (data.session) {
+            setUser({
+              id: data.user?.id || 'mock-id',
+              full_name: fullName,
+              email: email,
+              branch: branch,
+              role: 'student',
+              aura_score: 100,
+              aura_points: 0,
+              is_verified: false,
+              is_aadhaar_verified: false,
+              onboarding_completed: false,
+              created_at: data.user?.created_at || new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
+            router.push('/marketplace');
+          } else {
+            setIsRegistered(true);
+          }
         }
       } catch (err: any) {
         setIsLoading(false);
