@@ -257,26 +257,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             localStorage.setItem('aura_user', JSON.stringify(profile));
           } else {
             // Create user profile in profiles table on first sign in
-            const newProfile: Profile = {
+            const dbProfile = {
               id: session.user.id,
               full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'College Student',
               email: session.user.email || '',
               branch: session.user.user_metadata?.branch || 'Computer Science',
               hostel: session.user.user_metadata?.hostel || undefined,
-              role: 'student',
+              role: 'student' as any,
               aura_score: 100,
               aura_points: 0,
               is_verified: false,
-              is_aadhaar_verified: false,
-              onboarding_completed: false,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             };
-            const { error: insertError } = await supabase.from('profiles').insert(newProfile);
+            const { error: insertError } = await supabase.from('profiles').insert(dbProfile);
             if (insertError) {
               console.error('Failed to create user profile database row in syncSession:', insertError);
               throw new Error(`[DB ERROR] Code: ${insertError.code}. Message: ${insertError.message}. Details: ${insertError.details}. Hint: ${insertError.hint}`);
             }
+            const newProfile: Profile = {
+              ...dbProfile,
+              is_aadhaar_verified: false,
+              onboarding_completed: false
+            };
             setUserState(newProfile);
             localStorage.setItem('aura_user', JSON.stringify(newProfile));
           }
@@ -316,26 +319,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             localStorage.setItem('aura_user', JSON.stringify(profile));
           } else {
             // Create user profile in profiles table on first sign in
-            const newProfile: Profile = {
+            const dbProfile = {
               id: session.user.id,
               full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'College Student',
               email: session.user.email || '',
               branch: session.user.user_metadata?.branch || 'Computer Science',
               hostel: session.user.user_metadata?.hostel || undefined,
-              role: 'student',
+              role: 'student' as any,
               aura_score: 100,
               aura_points: 0,
               is_verified: false,
-              is_aadhaar_verified: false,
-              onboarding_completed: false,
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             };
-            const { error: insertError } = await supabase.from('profiles').insert(newProfile);
+            const { error: insertError } = await supabase.from('profiles').insert(dbProfile);
             if (insertError) {
               console.error('Failed to create user profile database row in onAuthStateChange:', insertError);
               throw new Error(`[DB ERROR] Code: ${insertError.code}. Message: ${insertError.message}. Details: ${insertError.details}. Hint: ${insertError.hint}`);
             }
+            const newProfile: Profile = {
+              ...dbProfile,
+              is_aadhaar_verified: false,
+              onboarding_completed: false
+            };
             setUserState(newProfile);
             localStorage.setItem('aura_user', JSON.stringify(newProfile));
           }
