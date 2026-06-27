@@ -146,6 +146,13 @@ export default function MarketplaceFeed() {
     );
   };
 
+  // Auto-request location access after login
+  useEffect(() => {
+    if (user && !detectedLocation && !locating) {
+      handleGetLocation();
+    }
+  }, [user]);
+
   const categories = ['Electronics', 'Books', 'Hostel Essentials', 'Furniture', 'Cycles', 'Sports', 'Fashion', 'Others'];
   const listingTypes = [
     { value: 'sell', label: 'Buy/Sell' },
