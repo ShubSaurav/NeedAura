@@ -12,9 +12,16 @@ export async function GET(request: Request) {
   if (code) {
     try {
       const cookieStore = await cookies();
-      const response = NextResponse.redirect(`${origin}${next}`);
+      
+      // Manually construct a mutable redirect response to bypass Next.js frozen header bugs
+      const response = new NextResponse(null, {
+        status: 307,
+        headers: {
+          Location: `${origin}${next}`,
+        },
+      });
 
-      // Create a Supabase client that writes cookies directly to the Redirect Response object
+      // Create a Supabase client that writes cookies directly to the Response object
       const supabase = createSupabaseServerClient(
         (process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock-supabase.supabase.co').trim(),
         (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock-anon-key').trim(),
@@ -50,5 +57,11 @@ export async function GET(request: Request) {
   }
 
   // Redirect to login page with error notice on failure
-  return NextResponse.redirect(`${origin}/login?error=Could not exchange auth code for session`);
+  const errorResponse = new NextResponse(null, {
+    status: 307,
+    headers: {
+      Location: `${origin}/login?error=Could not exchange auth code for session`,
+    },
+  });
+  return errorResponse;
 }
