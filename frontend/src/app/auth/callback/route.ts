@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     try {
       const cookieStore = await cookies();
       
-      // Manually construct a mutable redirect response to bypass Next.js frozen header bugs
+      // Manually construct a mutable redirect response
       const response = new NextResponse(null, {
         status: 307,
         headers: {
@@ -34,7 +34,19 @@ export async function GET(request: Request) {
               try {
                 cookiesToSet.forEach(({ name, value, options }) => {
                   console.log(`[Auth Callback] Setting cookie: ${name}, options:`, options);
-                  response.cookies.set(name, value, options);
+                  
+                  // Manually serialize the Set-Cookie header to guarantee it is sent raw
+                  const cookieParts = [`${name}=${value}`];
+                  if (options.path) cookieParts.push(`Path=${options.path}`);
+                  if (options.domain) cookieParts.push(`Domain=${options.domain}`);
+                  if (options.maxAge !== undefined) cookieParts.push(`Max-Age=${options.maxAge}`);
+                  if (options.sameSite) cookieParts.push(`SameSite=${options.sameSite}`);
+                  if (options.httpOnly) cookieParts.push(`HttpOnly`);
+                  if (options.secure) cookieParts.push(`Secure`);
+                  
+                  const rawCookieStr = cookieParts.join('; ');
+                  console.log('[Auth Callback] Appending raw header:', rawCookieStr);
+                  response.headers.append('Set-Cookie', rawCookieStr);
                 });
               } catch (err) {
                 console.error('[Auth Callback] Failed to set cookies on response:', err);
