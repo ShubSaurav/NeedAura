@@ -39,7 +39,7 @@ export default function Signup() {
 
   useEffect(() => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (url && url !== 'https://mock-supabase.supabase.co') {
+    if (url && url.trim() !== 'https://mock-supabase.supabase.co') {
       setIsRealSupabase(true);
     }
   }, []);
