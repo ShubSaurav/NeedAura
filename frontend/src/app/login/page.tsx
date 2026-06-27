@@ -254,7 +254,7 @@ export default function Login() {
         const { error: googleError } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
-            redirectTo: `${window.location.origin}/marketplace`,
+            redirectTo: `${window.location.origin}/auth/callback`,
           }
         });
         if (googleError) {
