@@ -244,7 +244,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               id: session.user.id,
               full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'College Student',
               email: session.user.email || '',
-              branch: 'Computer Science',
+              branch: session.user.user_metadata?.branch || 'Computer Science',
+              hostel: session.user.user_metadata?.hostel || undefined,
               role: 'student',
               aura_score: 100,
               aura_points: 0,
@@ -254,7 +255,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             };
-            await supabase.from('profiles').insert(newProfile);
+            const { error: insertError } = await supabase.from('profiles').insert(newProfile);
+            if (insertError) {
+              console.error('Failed to create user profile database row in syncSession:', insertError);
+            }
             setUserState(newProfile);
             localStorage.setItem('aura_user', JSON.stringify(newProfile));
           }
@@ -298,7 +302,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               id: session.user.id,
               full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'College Student',
               email: session.user.email || '',
-              branch: 'Computer Science',
+              branch: session.user.user_metadata?.branch || 'Computer Science',
+              hostel: session.user.user_metadata?.hostel || undefined,
               role: 'student',
               aura_score: 100,
               aura_points: 0,
@@ -310,7 +315,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             };
             const { error: insertError } = await supabase.from('profiles').insert(newProfile);
             if (insertError) {
-              console.error('Failed to create user profile database row:', insertError);
+              console.error('Failed to create user profile database row in onAuthStateChange:', insertError);
             }
             setUserState(newProfile);
             localStorage.setItem('aura_user', JSON.stringify(newProfile));

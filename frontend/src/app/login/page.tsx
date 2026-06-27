@@ -14,7 +14,7 @@ import { createClient } from '@/lib/supabase';
 
 export default function Login() {
   const router = useRouter();
-  const { setUser, language } = useApp();
+  const { user, setUser, language } = useApp();
   const t = translations[language];
   
   // Login method: 'email' or 'phone'
@@ -32,6 +32,13 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isRealSupabase, setIsRealSupabase] = useState(false);
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/marketplace');
+    }
+  }, [user, router]);
 
   // Check if real Supabase keys are configured in environment
   useEffect(() => {
@@ -85,22 +92,6 @@ export default function Login() {
           setError(loginError.message);
           setIsLoading(false);
         } else {
-          if (data.user) {
-            setUser({
-              id: data.user.id,
-              full_name: data.user.user_metadata?.full_name || email.split('@')[0].toUpperCase(),
-              email: data.user.email || email,
-              branch: data.user.user_metadata?.branch || 'Computer Science',
-              role: 'student',
-              aura_score: 100,
-              aura_points: 0,
-              is_verified: false,
-              is_aadhaar_verified: false,
-              onboarding_completed: false,
-              created_at: data.user.created_at,
-              updated_at: data.user.updated_at || new Date().toISOString()
-            });
-          }
           setIsLoading(false);
           router.push('/marketplace');
         }
@@ -191,23 +182,6 @@ export default function Login() {
           setError(verifyError.message);
           setIsLoading(false);
         } else {
-          if (data.user) {
-            setUser({
-              id: data.user.id,
-              full_name: data.user.user_metadata?.full_name || 'Verified Student',
-              email: data.user.email || `${phone}@needaura.phone`,
-              phone_number: data.user.phone || phone,
-              branch: data.user.user_metadata?.branch || 'Computer Science',
-              role: 'student',
-              aura_score: 100,
-              aura_points: 0,
-              is_verified: false,
-              is_aadhaar_verified: false,
-              onboarding_completed: false,
-              created_at: data.user.created_at,
-              updated_at: data.user.updated_at || new Date().toISOString()
-            });
-          }
           setIsLoading(false);
           router.push('/marketplace');
         }

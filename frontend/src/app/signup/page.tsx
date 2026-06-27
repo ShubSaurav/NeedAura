@@ -15,7 +15,7 @@ import { createClient } from '@/lib/supabase';
 
 export default function Signup() {
   const router = useRouter();
-  const { setUser } = useApp();
+  const { user, setUser } = useApp();
   
   // Sign up method: 'email' or 'phone'
   const [signupMethod, setSignupMethod] = useState<'email' | 'phone'>('email');
@@ -36,6 +36,13 @@ export default function Signup() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRealSupabase, setIsRealSupabase] = useState(false);
+
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (user) {
+      router.push('/marketplace');
+    }
+  }, [user, router]);
 
   useEffect(() => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -123,25 +130,7 @@ export default function Signup() {
         if (signupError) {
           setError(signupError.message);
         } else {
-          if (data.session) {
-            setUser({
-              id: data.user?.id || 'mock-id',
-              full_name: fullName,
-              email: email,
-              branch: branch,
-              role: 'student',
-              aura_score: 100,
-              aura_points: 0,
-              is_verified: false,
-              is_aadhaar_verified: false,
-              onboarding_completed: false,
-              created_at: data.user?.created_at || new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            });
-            router.push('/marketplace');
-          } else {
-            setIsRegistered(true);
-          }
+          setIsRegistered(true);
         }
       } catch (err: any) {
         setIsLoading(false);
@@ -224,7 +213,6 @@ export default function Signup() {
               full_name: fullName,
               branch: branch,
               hostel: hostel || '',
-              onboarding_completed: true,
             };
             
             await supabase
@@ -232,22 +220,16 @@ export default function Signup() {
               .update(profileUpdates)
               .eq('id', data.user.id);
 
-            setUser({
-              id: data.user.id,
-              full_name: fullName,
-              email: data.user.email || `${phone}@needaura.phone`,
-              phone_number: phone,
-              branch: branch,
-              hostel: hostel || undefined,
-              role: 'student',
-              aura_score: 100,
-              aura_points: 0,
-              is_verified: false,
-              is_aadhaar_verified: false,
-              onboarding_completed: true,
-              created_at: data.user.created_at,
-              updated_at: new Date().toISOString()
-            });
+            // Fetch fully resolved profile from DB
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', data.user.id)
+              .single();
+
+            if (profile) {
+              setUser(profile);
+            }
           }
           setIsLoading(false);
           router.push('/marketplace');
