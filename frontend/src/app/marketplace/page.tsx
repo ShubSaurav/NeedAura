@@ -113,6 +113,39 @@ export default function MarketplaceFeed() {
   const [isPaying, setIsPaying] = useState(false);
   const [paySuccess, setPaySuccess] = useState(false);
 
+  // Geolocation States
+  const [detectedLocation, setDetectedLocation] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
+
+  const handleGetLocation = () => {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+          const data = await res.json();
+          
+          const campusName = data.address.amenity || data.address.university || data.address.college || data.address.suburb || data.address.city || "Detected Campus Zone";
+          setDetectedLocation(campusName);
+        } catch (err) {
+          setDetectedLocation("Detected Campus Zone");
+        } finally {
+          setLocating(false);
+        }
+      },
+      (error) => {
+        setLocating(false);
+        console.error(error);
+        setDetectedLocation("Detected Campus Zone");
+      }
+    );
+  };
+
   const categories = ['Electronics', 'Books', 'Hostel Essentials', 'Furniture', 'Cycles', 'Sports', 'Fashion', 'Others'];
   const listingTypes = [
     { value: 'sell', label: 'Buy/Sell' },
@@ -246,14 +279,30 @@ export default function MarketplaceFeed() {
           {/* Search Panel */}
           <div className="space-y-2">
             <label className="text-xs font-mono text-slate-500 uppercase tracking-wider block">Search Campus</label>
-            <div id="tour-search" className="relative">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
-              <Input
-                placeholder="Find calculators, books..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
+            <div id="tour-search" className="relative flex flex-col gap-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 w-4 h-4 text-slate-500" />
+                <Input
+                  placeholder="Find calculators, books..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleGetLocation}
+                className="text-[10px] font-mono text-slate-400 hover:text-white flex items-center gap-1.5 py-1 px-1.5 bg-slate-950/40 rounded border border-card-border/40 hover:border-brand-blue/30 transition-all text-left justify-start"
+              >
+                <MapPin className="w-3 h-3 text-brand-blue" />
+                {locating ? (
+                  <span className="animate-pulse">Locating campus...</span>
+                ) : detectedLocation ? (
+                  <span className="text-brand-blue font-semibold">{detectedLocation} (Detected)</span>
+                ) : (
+                  <span>Detect My Location</span>
+                )}
+              </button>
             </div>
           </div>
 
