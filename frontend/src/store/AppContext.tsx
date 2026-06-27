@@ -291,6 +291,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (profile) {
           setUserState(profile);
           localStorage.setItem('aura_user', JSON.stringify(profile));
+        } else {
+          // Create user profile in profiles table on first sign in
+          const newProfile: Profile = {
+            id: session.user.id,
+            full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'College Student',
+            email: session.user.email || '',
+            branch: 'Computer Science',
+            role: 'student',
+            aura_score: 100,
+            aura_points: 0,
+            is_verified: false,
+            is_aadhaar_verified: false,
+            onboarding_completed: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          await supabase.from('profiles').insert(newProfile);
+          setUserState(newProfile);
+          localStorage.setItem('aura_user', JSON.stringify(newProfile));
         }
       } else {
         setUserState(null);
