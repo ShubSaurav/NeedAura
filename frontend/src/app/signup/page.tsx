@@ -96,17 +96,26 @@ export default function Signup() {
       try {
         const supabase = createClient();
         console.log('[Signup] Initiating supabase.auth.signUp...');
-        const { data, error: signupError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-              branch: branch,
-              hostel: hostel || '',
+        
+        // Timeout helper
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timed out after 15 seconds. Please check your Supabase project status or SMTP configuration.')), 15000)
+        );
+
+        const { data, signupError } = await Promise.race([
+          supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                full_name: fullName,
+                branch: branch,
+                hostel: hostel || '',
+              }
             }
-          }
-        });
+          }).then(res => ({ data: res.data, signupError: res.error })),
+          timeoutPromise
+        ]) as any;
 
         console.log('[Signup] supabase.auth.signUp completed. Response:', { data, signupError });
 

@@ -65,10 +65,19 @@ export default function Login() {
       try {
         const supabase = createClient();
         console.log('[Login] Initiating supabase.auth.signInWithPassword...');
-        const { data, error: loginError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        
+        // Timeout helper
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timed out after 15 seconds. Please check your Supabase project status or internet connection.')), 15000)
+        );
+
+        const { data, loginError } = await Promise.race([
+          supabase.auth.signInWithPassword({
+            email,
+            password,
+          }).then(res => ({ data: res.data, loginError: res.error })),
+          timeoutPromise
+        ]) as any;
 
         console.log('[Login] supabase.auth.signInWithPassword completed. Response:', { data, loginError });
 
