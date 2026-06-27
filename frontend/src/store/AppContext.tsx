@@ -213,7 +213,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Check localStorage if browser env
   const [user, setUserState] = useState<Profile | null>(null);
   const [language, setLanguageState] = useState<LanguageType>('en');
-  const [theme, setThemeState] = useState<ThemeType>('dark');
+  const [theme, setThemeState] = useState<ThemeType>('light');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [listings, setListings] = useState<Listing[]>([]);
 
@@ -303,7 +303,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setThemeState(savedTheme);
       document.documentElement.classList.toggle('light-theme', savedTheme === 'light');
     } else {
-      document.documentElement.classList.add('dark-theme');
+      setThemeState('light');
+      document.documentElement.classList.add('light-theme');
     }
 
     // Load active listings from database (Supabase)
