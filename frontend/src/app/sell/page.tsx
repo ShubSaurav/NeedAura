@@ -15,6 +15,50 @@ import { analyzeListingImage } from '@/actions/listingActions';
 import { useApp, translations } from '@/store/AppContext';
 import { createClient } from '@/lib/supabase';
 
+// Helper to compress image on client-side before storing as base64 in DB
+const compressImageToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new globalThis.Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          resolve(event.target?.result as string);
+          return;
+        }
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+        resolve(compressedBase64);
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+
 export default function SellListing() {
   const router = useRouter();
   const { user, addListing, language } = useApp();
@@ -37,7 +81,6 @@ export default function SellListing() {
 
   // UI Flow States
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -47,23 +90,10 @@ export default function SellListing() {
   const [scanningLogs, setScanningLogs] = useState<string[]>([]);
 
   // Trigger Aura Lens AI Valuation Scan
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    // Save files state
-    setImageFiles(prev => [...prev, ...files]);
-
-    // Generate object URLs for preview
-    const newUrls = files.map(file => URL.createObjectURL(file));
-    const updatedImages = [...uploadedImages, ...newUrls];
-    setUploadedImages(updatedImages);
-    
-    // Select the first of the newly uploaded batch
-    setSelectedImageIndex(uploadedImages.length);
-
-    // AI scans the primary file uploaded in this batch
-    const primaryFile = files[0];
     setIsAnalyzing(true);
     setAnalysisCompleted(false);
     setScanningLogs([]);
@@ -81,34 +111,43 @@ export default function SellListing() {
       }, (index + 1) * 600);
     });
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const base64Data = (reader.result as string).split(',')[1];
-        const mimeType = primaryFile.type || 'image/jpeg';
-        
-        const result = await analyzeListingImage(base64Data, mimeType, primaryFile.name);
+    try {
+      // Compress and convert all files to base64
+      const base64Promises = files.map(file => compressImageToBase64(file));
+      const base64Images = await Promise.all(base64Promises);
+      
+      const updatedImages = [...uploadedImages, ...base64Images];
+      setUploadedImages(updatedImages);
+      
+      // Select the first of the newly uploaded batch
+      setSelectedImageIndex(uploadedImages.length);
+
+      // AI scans the primary file uploaded in this batch
+      const primaryFile = files[0];
+      const primaryBase64 = base64Images[0];
+      const base64Data = primaryBase64.split(',')[1];
+      const mimeType = primaryFile.type || 'image/jpeg';
+      
+      const result = await analyzeListingImage(base64Data, mimeType, primaryFile.name);
+      setIsAnalyzing(false);
+      
+      if (result.success && result.data) {
+        setTitle(result.data.title);
+        setDescription(result.data.description);
+        setCategory(result.data.category);
+        setConditionScore(result.data.conditionScore);
+        setPrice(result.data.suggestedPrice.toString());
+        setSuggestedPrice(result.data.suggestedPrice);
+        setMarketPrice(result.data.marketPrice);
+        setScamConfidence(result.data.scamLevel);
+        setAnalysisCompleted(true);
+      } else {
         setIsAnalyzing(false);
-        
-        if (result.success && result.data) {
-          setTitle(result.data.title);
-          setDescription(result.data.description);
-          setCategory(result.data.category);
-          setConditionScore(result.data.conditionScore);
-          setPrice(result.data.suggestedPrice.toString());
-          setSuggestedPrice(result.data.suggestedPrice);
-          setMarketPrice(result.data.marketPrice);
-          setScamConfidence(result.data.scamLevel);
-          setAnalysisCompleted(true);
-        } else {
-          setIsAnalyzing(false);
-        }
-      } catch (err: any) {
-        setIsAnalyzing(false);
-        console.error('Failed to analyze image:', err);
       }
-    };
-    reader.readAsDataURL(primaryFile);
+    } catch (err: any) {
+      setIsAnalyzing(false);
+      console.error('Failed to process image:', err);
+    }
   };
 
   // Re-run pricing analysis when title changes (simulates live database lookup)
@@ -162,32 +201,6 @@ export default function SellListing() {
     setSubmitError(null);
 
     try {
-      const supabase = createClient();
-      const publicUrls: string[] = [];
-
-      // Upload each file to Supabase Storage bucket 'listings'
-      for (let i = 0; i < imageFiles.length; i++) {
-        const file = imageFiles[i];
-        const fileExt = file.name.split('.').pop();
-        const uniqueId = Math.random().toString(36).substring(2, 9);
-        const fileName = `${user.id}/${Date.now()}-${uniqueId}.${fileExt}`;
-        const filePath = `public/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('listings')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        if (uploadError) {
-          throw new Error(`Storage Upload Error: ${uploadError.message}. Make sure you have created a public bucket named "listings" in your Supabase storage dashboard.`);
-        }
-
-        const { data: publicUrlData } = supabase.storage.from('listings').getPublicUrl(filePath);
-        publicUrls.push(publicUrlData.publicUrl);
-      }
-
       await addListing({
         seller_id: user.id,
         title,
@@ -197,7 +210,7 @@ export default function SellListing() {
         market_price: marketPrice || undefined,
         category,
         condition_score: conditionScore,
-        image_urls: publicUrls,
+        image_urls: uploadedImages, // Pass compressed base64 strings directly
         listing_type: listingType,
         pickup_zone: pickupZone,
         status: 'active',
@@ -316,7 +329,6 @@ export default function SellListing() {
                           e.stopPropagation();
                           const updated = uploadedImages.filter((_, i) => i !== idx);
                           setUploadedImages(updated);
-                          setImageFiles(prev => prev.filter((_, i) => i !== idx));
                           if (selectedImageIndex >= updated.length) {
                             setSelectedImageIndex(Math.max(0, updated.length - 1));
                           }
