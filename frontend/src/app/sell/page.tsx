@@ -13,6 +13,7 @@ import { Input, Textarea } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { analyzeListingImage } from '@/actions/listingActions';
 import { useApp, translations } from '@/store/AppContext';
+import { createClient } from '@/lib/supabase';
 
 export default function SellListing() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function SellListing() {
 
   // UI Flow States
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -48,6 +50,9 @@ export default function SellListing() {
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
+
+    // Save files state
+    setImageFiles(prev => [...prev, ...files]);
 
     // Generate object URLs for preview
     const newUrls = files.map(file => URL.createObjectURL(file));
@@ -157,6 +162,32 @@ export default function SellListing() {
     setSubmitError(null);
 
     try {
+      const supabase = createClient();
+      const publicUrls: string[] = [];
+
+      // Upload each file to Supabase Storage bucket 'listings'
+      for (let i = 0; i < imageFiles.length; i++) {
+        const file = imageFiles[i];
+        const fileExt = file.name.split('.').pop();
+        const uniqueId = Math.random().toString(36).substring(2, 9);
+        const fileName = `${user.id}/${Date.now()}-${uniqueId}.${fileExt}`;
+        const filePath = `public/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('listings')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          throw new Error(`Storage Upload Error: ${uploadError.message}. Make sure you have created a public bucket named "listings" in your Supabase storage dashboard.`);
+        }
+
+        const { data: publicUrlData } = supabase.storage.from('listings').getPublicUrl(filePath);
+        publicUrls.push(publicUrlData.publicUrl);
+      }
+
       await addListing({
         seller_id: user.id,
         title,
@@ -166,7 +197,7 @@ export default function SellListing() {
         market_price: marketPrice || undefined,
         category,
         condition_score: conditionScore,
-        image_urls: uploadedImages,
+        image_urls: publicUrls,
         listing_type: listingType,
         pickup_zone: pickupZone,
         status: 'active',
@@ -177,7 +208,7 @@ export default function SellListing() {
       router.push('/marketplace');
     } catch (err: any) {
       setIsSubmitting(false);
-      setSubmitError(err.message || 'Failed to publish listing to Supabase database. Please check Row Level Security (RLS) policies.');
+      setSubmitError(err.message || 'Failed to publish listing.');
     }
   };
 
@@ -285,6 +316,7 @@ export default function SellListing() {
                           e.stopPropagation();
                           const updated = uploadedImages.filter((_, i) => i !== idx);
                           setUploadedImages(updated);
+                          setImageFiles(prev => prev.filter((_, i) => i !== idx));
                           if (selectedImageIndex >= updated.length) {
                             setSelectedImageIndex(Math.max(0, updated.length - 1));
                           }
