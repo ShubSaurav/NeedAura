@@ -272,7 +272,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             setUserState(profile);
             localStorage.setItem('aura_user', JSON.stringify(profile));
           } else {
-            // Create user profile in profiles table on first sign in
+            // Create or update user profile using upsert (prevents duplicate key errors)
             const dbProfile = {
               id: session.user.id,
               full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'College Student',
@@ -286,10 +286,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             };
-            const { error: insertError } = await supabase.from('profiles').insert(dbProfile);
-            if (insertError) {
-              console.error('Failed to create user profile database row in syncSession:', insertError);
-              throw new Error(`[DB ERROR] Code: ${insertError.code}. Message: ${insertError.message}. Details: ${insertError.details}. Hint: ${insertError.hint}`);
+            const { error: upsertError } = await supabase.from('profiles').upsert(dbProfile);
+            if (upsertError) {
+              console.error('Failed to upsert user profile in syncSession:', upsertError);
+              throw new Error(`[DB ERROR] Code: ${upsertError.code}. Message: ${upsertError.message}. Details: ${upsertError.details}. Hint: ${upsertError.hint}`);
             }
             const newProfile: Profile = {
               ...dbProfile,
@@ -346,7 +346,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             setUserState(profile);
             localStorage.setItem('aura_user', JSON.stringify(profile));
           } else {
-            // Create user profile in profiles table on first sign in
+            // Create or update user profile using upsert (prevents duplicate key errors)
             const dbProfile = {
               id: session.user.id,
               full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'College Student',
@@ -360,10 +360,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
               created_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             };
-            const { error: insertError } = await supabase.from('profiles').insert(dbProfile);
-            if (insertError) {
-              console.error('Failed to create user profile database row in onAuthStateChange:', insertError);
-              throw new Error(`[DB ERROR] Code: ${insertError.code}. Message: ${insertError.message}. Details: ${insertError.details}. Hint: ${insertError.hint}`);
+            const { error: upsertError } = await supabase.from('profiles').upsert(dbProfile);
+            if (upsertError) {
+              console.error('Failed to upsert user profile in onAuthStateChange:', upsertError);
+              throw new Error(`[DB ERROR] Code: ${upsertError.code}. Message: ${upsertError.message}. Details: ${upsertError.details}. Hint: ${upsertError.hint}`);
             }
             const newProfile: Profile = {
               ...dbProfile,
