@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useApp } from '@/store/AppContext';
 import { ShieldAlert, CheckCircle, ArrowLeft, ArrowRight, Zap, Mail, Phone } from 'lucide-react';
@@ -20,9 +20,13 @@ export default function Signup() {
   // Track if we checked the user session on initial page mount
   const hasCheckedInitialUser = useRef(false);
   
+  // Form Wizard Step: 1 = Credentials, 2 = Campus Details
+  const [formStep, setFormStep] = useState(1);
+
   // Sign up method: 'email' or 'phone'
   const [signupMethod, setSignupMethod] = useState<'email' | 'phone'>('email');
   
+  // Form Inputs
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
@@ -494,95 +498,160 @@ export default function Signup() {
                   </form>
                 ) : (
                   /* Standard Email or Phone input details form */
-                  <form onSubmit={signupMethod === 'email' ? handleSignup : handleSendOtp} className="space-y-4 pt-2">
+                  <form onSubmit={(e) => {
+                    e.preventDefault();
+                    if (formStep === 1) {
+                      setFormStep(2);
+                    } else {
+                      if (signupMethod === 'email') {
+                        handleSignup(e);
+                      } else {
+                        handleSendOtp(e);
+                      }
+                    }
+                  }} className="space-y-4 pt-2">
                     
-                    {signupMethod === 'email' ? (
-                      <div className="space-y-2 animate-fadeIn">
-                        <label className="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                          <Mail className="w-3.5 h-3.5 text-brand-blue" /> Email Address
-                        </label>
-                        <Input
-                          type="email"
-                          placeholder="you@gmail.com or you@university.edu"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          required
-                          className={recognizedUniversity && !recognizedUniversity.includes('Personal') ? 'border-emerald-500/50' : ''}
-                        />
-                        
-                        {recognizedUniversity && (
-                          <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-1.5 mt-2">
-                            <CheckCircle className="w-4 h-4 text-emerald-400" />
-                            <span className="text-xs text-emerald-400 font-medium font-sans">
-                              Detected: {recognizedUniversity}
-                            </span>
-                          </motion.div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="space-y-2 animate-fadeIn">
-                        <label className="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                          <Phone className="w-3.5 h-3.5 text-brand-blue" /> Phone Number
-                        </label>
-                        <Input
-                          type="tel"
-                          placeholder="e.g. +91 98765 43210"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          required
-                        />
-                      </div>
-                    )}
+                    <AnimatePresence mode="wait">
+                      {formStep === 1 ? (
+                        <motion.div
+                          key="form-step-1"
+                          initial={{ opacity: 0, x: -15 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 15 }}
+                          transition={{ duration: 0.2 }}
+                          className="space-y-4"
+                        >
+                          {/* Step Indicator */}
+                          <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 uppercase tracking-wider pb-1 border-b border-card-border/40">
+                            <span>Step 1 of 2: Credentials</span>
+                            <span className="text-brand-blue font-bold">50% Complete</span>
+                          </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Full Name</label>
-                        <Input type="text" placeholder="Shubham Saurav" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Password</label>
-                        <Input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                      </div>
-                    </div>
+                          {signupMethod === 'email' ? (
+                            <div className="space-y-2 animate-fadeIn">
+                              <label className="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Mail className="w-3.5 h-3.5 text-brand-blue" /> Email Address
+                              </label>
+                              <Input
+                                type="email"
+                                placeholder="you@gmail.com or you@university.edu"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                                className={recognizedUniversity && !recognizedUniversity.includes('Personal') ? 'border-emerald-500/50' : ''}
+                              />
+                              
+                              {recognizedUniversity && (
+                                <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="flex items-center gap-1.5 mt-2">
+                                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                                  <span className="text-xs text-emerald-400 font-medium font-sans">
+                                    Detected: {recognizedUniversity}
+                                  </span>
+                                </motion.div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="space-y-2 animate-fadeIn">
+                              <label className="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Phone className="w-3.5 h-3.5 text-brand-blue" /> Phone Number
+                              </label>
+                              <Input
+                                type="tel"
+                                placeholder="e.g. +91 98765 43210"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                required
+                              />
+                            </div>
+                          )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Course / Branch</label>
-                        <Input type="text" placeholder="e.g. CSE, ECE, MBA" value={branch} onChange={(e) => setBranch(e.target.value)} required />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Hostel Room (Optional)</label>
-                        <Input type="text" placeholder="e.g. Block A, Rm 302" value={hostel} onChange={(e) => setHostel(e.target.value)} />
-                      </div>
-                    </div>
+                          <div className="space-y-2">
+                            <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Password</label>
+                            <Input type="password" placeholder="Create password (min 6 chars)" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                          </div>
 
-                    {error && (
-                      <div className="text-sm text-brand-orange bg-brand-orange/5 p-3 rounded border border-brand-orange/20 font-sans">
-                        {error}
-                      </div>
-                    )}
-
-                    <Button
-                      type="submit"
-                      variant={canSubmit && !isLoading ? 'primary' : 'secondary'}
-                      glow={canSubmit && !isLoading}
-                      className="w-full mt-4 py-3 text-sm font-semibold transition-all duration-300"
-                      disabled={!canSubmit || isLoading}
-                    >
-                      {isLoading ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                          </svg>
-                          Registering Account...
-                        </span>
+                          <Button
+                            type="button"
+                            variant="primary"
+                            glow
+                            className="w-full mt-4 py-3 text-sm font-semibold transition-all duration-300"
+                            disabled={signupMethod === 'email' ? (!email || password.length < 6) : (!phone || password.length < 6)}
+                            onClick={() => setFormStep(2)}
+                          >
+                            Continue: Campus Details <ArrowRight className="w-4 h-4 ml-1.5" />
+                          </Button>
+                        </motion.div>
                       ) : (
-                        <span className="flex items-center justify-center gap-1.5">
-                          {signupMethod === 'phone' ? 'Send OTP Verification Code' : 'Register Account'} <ArrowRight className="w-4 h-4 ml-1.5" />
-                        </span>
+                        <motion.div
+                          key="form-step-2"
+                          initial={{ opacity: 0, x: 15 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -15 }}
+                          transition={{ duration: 0.2 }}
+                          className="space-y-4"
+                        >
+                          {/* Step Indicator */}
+                          <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 uppercase tracking-wider pb-1 border-b border-card-border/40">
+                            <span>Step 2 of 2: Campus Details</span>
+                            <span className="text-brand-blue font-bold">Ready to Register</span>
+                          </div>
+
+                          <div className="space-y-2">
+                            <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Full Name</label>
+                            <Input type="text" placeholder="Shubham Saurav" value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Course / Branch</label>
+                              <Input type="text" placeholder="e.g. CSE, ECE, MBA" value={branch} onChange={(e) => setBranch(e.target.value)} required />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-xs font-mono text-slate-400 uppercase tracking-wider block">Hostel Room (Optional)</label>
+                              <Input type="text" placeholder="e.g. Block A, Rm 302" value={hostel} onChange={(e) => setHostel(e.target.value)} />
+                            </div>
+                          </div>
+
+                          {error && (
+                            <div className="text-sm text-brand-orange bg-brand-orange/5 p-3 rounded border border-brand-orange/20 font-sans text-center">
+                              {error}
+                            </div>
+                          )}
+
+                          <div className="flex gap-3 pt-2">
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              className="flex-1 py-3 text-sm"
+                              onClick={() => setFormStep(1)}
+                            >
+                              <ArrowLeft className="w-4 h-4 mr-1.5" /> Back
+                            </Button>
+                            <Button
+                              type="submit"
+                              variant={canSubmit && !isLoading ? 'primary' : 'secondary'}
+                              glow={canSubmit && !isLoading}
+                              className="flex-[2] py-3 text-sm font-semibold transition-all duration-300"
+                              disabled={!canSubmit || isLoading}
+                            >
+                              {isLoading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                  <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                  </svg>
+                                  Registering Account...
+                                </span>
+                              ) : (
+                                <span className="flex items-center justify-center gap-1.5">
+                                  {signupMethod === 'phone' ? 'Send OTP Code' : 'Register Account'} <ArrowRight className="w-4 h-4 ml-1.5" />
+                                </span>
+                              )}
+                            </Button>
+                          </div>
+                        </motion.div>
                       )}
-                    </Button>
+                    </AnimatePresence>
 
                     <div className="text-center pt-2">
                       <span className="text-xs text-slate-500 font-sans">
