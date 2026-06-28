@@ -99,7 +99,7 @@ export default function ModeratorDashboard() {
             <h2 className="text-xl font-bold font-display text-white flex items-center gap-1.5">
               <ShieldCheck className="w-5 h-5 text-brand-blue" /> Admin Panel
             </h2>
-            <p className="text-xs text-slate-500 font-mono">University Moderation</p>
+            <p className="text-xs text-slate-500 font-mono">Campus Moderation</p>
           </div>
 
           <div className="flex flex-col gap-1.5">

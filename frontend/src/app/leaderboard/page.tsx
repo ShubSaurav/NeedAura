@@ -79,7 +79,7 @@ export default function LeaderboardPage() {
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              University Wide
+              Campus Wide
             </button>
             <button
               onClick={() => setGroupBy('branch')}

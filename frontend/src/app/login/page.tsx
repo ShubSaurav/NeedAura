@@ -429,7 +429,7 @@ export default function Login() {
                       </label>
                       <Input
                         type="email"
-                        placeholder="you@gmail.com or you@university.edu"
+                        placeholder="you@gmail.com or you@campus.edu"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required

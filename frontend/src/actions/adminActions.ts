@@ -36,7 +36,7 @@ export async function getPendingVerifications(): Promise<{ success: boolean; dat
         id: 'p-user-1',
         fullName: 'Ishita Kapoor',
         email: 'ishita.k@chitkara.edu.in',
-        university: 'Chitkara University',
+        university: 'Chitkara Campus',
         branch: 'Electronics',
         studentIdUrl: '/mock-id-card-ishita.jpg',
         auraScore: 100
@@ -45,7 +45,7 @@ export async function getPendingVerifications(): Promise<{ success: boolean; dat
         id: 'p-user-2',
         fullName: 'Kabir Verma',
         email: 'kabir@lpu.in',
-        university: 'Lovely Professional University (LPU)',
+        university: 'Lovely Professional Campus (LPU)',
         branch: 'Mechanical Eng.',
         studentIdUrl: '/mock-id-card-kabir.jpg',
         auraScore: 100

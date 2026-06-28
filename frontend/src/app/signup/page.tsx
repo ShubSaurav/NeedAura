@@ -74,11 +74,11 @@ export default function Signup() {
 
   // Registered universities for domain checks
   const recognizedDomains: Record<string, string> = {
-    'chitkara.edu.in': 'Chitkara University',
-    'lpu.in': 'Lovely Professional University (LPU)',
-    'cuchd.in': 'Chandigarh University (CU)',
+    'chitkara.edu.in': 'Chitkara Campus',
+    'lpu.in': 'Lovely Professional Campus (LPU)',
+    'cuchd.in': 'Chandigarh Campus (CU)',
     'iitd.ac.in': 'IIT Delhi',
-    'student.cuchd.in': 'Chandigarh University (Student)',
+    'student.cuchd.in': 'Chandigarh Campus (Student)',
   };
 
   // Run domain verification check as the user types their email
@@ -534,7 +534,7 @@ export default function Signup() {
                               </label>
                               <Input
                                 type="email"
-                                placeholder="you@gmail.com or you@university.edu"
+                                placeholder="you@gmail.com or you@campus.edu"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required

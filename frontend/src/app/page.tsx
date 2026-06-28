@@ -21,7 +21,7 @@ export default function Home() {
       quote: "Needed a scientific calculator for my end-term exam. Found a senior selling it for ₹400 on NeedAura, got it in 15 mins at the library pickup zone. Saved my grade!",
       author: "Rahul Sharma",
       role: "B.Tech CSE, Year 3",
-      university: "Chitkara University",
+      university: "Chitkara Campus",
       aura: "Verified Student",
       initials: "RS"
     },
@@ -37,7 +37,7 @@ export default function Home() {
       quote: "Found all my first-year engineering textbooks in a bundle for cheap. The buyer-seller search and chat interface is extremely clean.",
       author: "Aarav Gupta",
       role: "B.CA, Year 1",
-      university: "Chitkara University",
+      university: "Chitkara Campus",
       aura: "Verified Student",
       initials: "AG"
     }
@@ -212,7 +212,7 @@ export default function Home() {
           <div className="text-center max-w-2xl mx-auto mb-16 space-y-2">
             <Badge variant="purple">WHAT STUDENTS SAY</Badge>
             <h2 className="text-3xl md:text-4xl font-bold font-display text-white">Loved by Students</h2>
-            <p className="text-slate-400 text-sm">Hear what students in Chitkara University and other colleges say.</p>
+            <p className="text-slate-400 text-sm">Hear what students in Chitkara Campus and other colleges say.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">

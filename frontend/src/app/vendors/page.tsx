@@ -112,7 +112,7 @@ export default function VendorPortal() {
             <h2 className="text-xl font-bold font-display text-white flex items-center gap-1.5">
               <Store className="w-5 h-5 text-brand-blue" /> Campus Vendors
             </h2>
-            <p className="text-xs text-slate-500 font-mono">Verified University Outlets</p>
+            <p className="text-xs text-slate-500 font-mono">Campus Outlets</p>
           </div>
 
           <div className="space-y-3.5">

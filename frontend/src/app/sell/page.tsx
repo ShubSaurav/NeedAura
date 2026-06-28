@@ -568,7 +568,7 @@ export default function SellListing() {
                       onChange={(e: any) => setVisibility(e.target.value)}
                       className="flex h-10 w-full rounded-md border border-card-border bg-slate-950/50 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-blue/50 focus:ring-2 focus:ring-brand-blue/20"
                     >
-                      <option value="campus">My University Only (CU)</option>
+                      <option value="campus">My Campus Only (CU)</option>
                       <option value="network">Partner College Network</option>
                       <option value="public">Everyone (Public Search)</option>
                     </select>

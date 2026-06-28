@@ -12,10 +12,10 @@ import { Badge } from '@/components/ui/Badge';
 import { createClient } from '@/lib/supabase';
 
 const UNIVERSITIES = [
-  { id: 'uni-1', name: 'Chitkara University', lat: 30.516, lng: 76.659 },
+  { id: 'uni-1', name: 'Chitkara Campus', lat: 30.516, lng: 76.659 },
   { id: 'uni-2', name: 'IIT Delhi', lat: 28.545, lng: 77.192 },
-  { id: 'uni-3', name: 'Lovely Professional University (LPU)', lat: 31.253, lng: 75.703 },
-  { id: 'uni-4', name: 'Chandigarh University', lat: 30.768, lng: 76.575 },
+  { id: 'uni-3', name: 'Lovely Professional Campus (LPU)', lat: 31.253, lng: 75.703 },
+  { id: 'uni-4', name: 'Chandigarh Campus', lat: 30.768, lng: 76.575 },
   { id: 'uni-5', name: 'IIT Bombay', lat: 19.133, lng: 72.914 },
 ];
 
@@ -64,7 +64,7 @@ export default function OnboardingPage() {
         const { latitude, longitude } = position.coords;
         console.log(`Detected Location: lat ${latitude}, lng ${longitude}`);
 
-        // Find nearest university from list
+        // Find nearest campus from list
         let closest = null;
         let minDistance = 0.05; // degree threshold (~5km)
 
@@ -82,7 +82,7 @@ export default function OnboardingPage() {
             setDetectedUni(closest);
             setSelectedUni(closest.name);
           } else {
-            // Default mock matching to Chitkara University for demo convenience!
+            // Default mock matching to Chitkara Campus for demo convenience!
             setDetectedUni(UNIVERSITIES[0]);
             setSelectedUni(UNIVERSITIES[0].name);
           }
@@ -276,7 +276,7 @@ export default function OnboardingPage() {
                   </div>
                   <CardTitle className="text-2xl font-display">Campus Location Check</CardTitle>
                   <CardDescription>
-                    To ensure campus safety, we verify your physical college location. We'll check if you are within university bounds.
+                    To ensure campus safety, we verify your physical college location. We'll check if you are within campus bounds.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6 pt-4">

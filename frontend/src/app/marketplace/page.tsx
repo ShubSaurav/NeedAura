@@ -511,7 +511,7 @@ export default function MarketplaceFeed() {
               </div>
               <h4 className="font-bold text-slate-300 text-lg font-display">No Campus Listings Found</h4>
               <p className="text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
-                Adjust your category or search filters, or list a new item to start the trading ring in your university today!
+                Adjust your category or search filters, or list a new item to start the trading ring on your campus today!
               </p>
             </div>
           )}
@@ -598,7 +598,7 @@ export default function MarketplaceFeed() {
                         <span className="text-xs font-semibold text-white block">
                           {selectedListing.seller_id === user?.id ? `${user.full_name} (You)` : 'Shubham Saurav'}
                         </span>
-                        <span className="text-[10px] text-slate-500 font-mono">Chitkara University (CS)</span>
+                        <span className="text-[10px] text-slate-500 font-mono">Chitkara Campus (CS)</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-card-border">
@@ -615,7 +615,7 @@ export default function MarketplaceFeed() {
                           <p className="text-xs font-bold text-white flex justify-center items-center gap-1.5">
                             <img src="/logo.png" alt="Logo" className="w-4.5 h-auto object-contain shrink-0" /> Want to sell 10x faster?
                           </p>
-                          <p className="text-[10px] text-slate-400">Pin this listing to the very top of your university marketplace feed.</p>
+                          <p className="text-[10px] text-slate-400">Pin this listing to the very top of your campus marketplace feed.</p>
                           <Button 
                             variant="accent" 
                             glow 

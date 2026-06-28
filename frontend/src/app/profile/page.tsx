@@ -76,8 +76,8 @@ export default function ProfileDashboard() {
 
   const profile = {
     fullName: user?.full_name || 'Student Member',
-    email: user?.email || 'student@university.edu.in',
-    university: user?.university_id === 'uni-1' ? 'Chitkara University' : user?.university_id === 'uni-2' ? 'IIT Delhi' : user?.university_id === 'uni-3' ? 'Lovely Professional University (LPU)' : 'Chitkara University',
+    email: user?.email || 'student@campus.edu.in',
+    university: user?.university_id === 'uni-1' ? 'Chitkara Campus' : user?.university_id === 'uni-2' ? 'IIT Delhi' : user?.university_id === 'uni-3' ? 'Lovely Professional Campus (LPU)' : 'Chitkara Campus',
     branch: user?.branch || 'Computer Science',
     hostel: user?.hostel || 'Hostel Block A, Room 302',
     memberSince: 'June 2026',
