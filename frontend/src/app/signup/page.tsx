@@ -39,10 +39,10 @@ export default function Signup() {
 
   // Redirect if user is already logged in
   useEffect(() => {
-    if (user) {
+    if (user && !isRegistered) {
       router.push('/marketplace');
     }
-  }, [user, router]);
+  }, [user, router, isRegistered]);
 
   useEffect(() => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -130,6 +130,13 @@ export default function Signup() {
         if (signupError) {
           setError(signupError.message);
         } else {
+          // Explicitly sign out if Supabase automatically logged them in
+          try {
+            const supabase = createClient();
+            await supabase.auth.signOut();
+          } catch (e) {
+            console.error('Failed to sign out after signup:', e);
+          }
           setIsRegistered(true);
         }
       } catch (err: any) {

@@ -426,6 +426,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!user) return;
     const updated = { ...user, ...profileUpdates };
     setUser(updated);
+    localStorage.setItem('aura_user', JSON.stringify(updated));
+
+    // Save to database asynchronously
+    (async () => {
+      try {
+        const supabase = createClient();
+        const dbUpdates: any = {
+          full_name: profileUpdates.full_name,
+          branch: profileUpdates.branch,
+          hostel: profileUpdates.hostel,
+          university_id: profileUpdates.university_id,
+          avatar_url: profileUpdates.avatar_url,
+          is_verified: profileUpdates.is_verified,
+          aura_score: profileUpdates.aura_score,
+          aura_points: profileUpdates.aura_points,
+        };
+
+        if (profileUpdates.aadhaar_no !== undefined) dbUpdates.aadhaar_no = profileUpdates.aadhaar_no;
+        if (profileUpdates.is_aadhaar_verified !== undefined) dbUpdates.is_aadhaar_verified = profileUpdates.is_aadhaar_verified;
+        if (profileUpdates.onboarding_completed !== undefined) dbUpdates.onboarding_completed = profileUpdates.onboarding_completed;
+
+        // Filter out undefined keys
+        Object.keys(dbUpdates).forEach(key => dbUpdates[key] === undefined && delete dbUpdates[key]);
+
+        if (Object.keys(dbUpdates).length > 0) {
+          const { error } = await supabase
+            .from('profiles')
+            .update(dbUpdates)
+            .eq('id', user.id);
+
+          if (error) {
+            console.error('[AppContext] Failed to persist profile updates to DB:', error);
+            if (error.message.includes('unique') || error.message.includes('aadhaar_no') || error.code === '23505') {
+              alert('Security Alert: This Aadhaar card number is already registered and linked to another account.');
+              // Revert client-side state
+              setUser(user);
+              localStorage.setItem('aura_user', JSON.stringify(user));
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[AppContext] Exception in updateUserProfile:', err);
+      }
+    })();
   };
 
   const setLanguage = (lang: LanguageType) => {
