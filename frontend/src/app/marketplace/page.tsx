@@ -140,7 +140,7 @@ export default function MarketplaceFeed() {
       },
       (error) => {
         setLocating(false);
-        console.error(error);
+        console.warn('Geolocation access failed or was denied, using fallback campus location:', error.message || error);
         setDetectedLocation("Detected Campus Zone");
       }
     );
