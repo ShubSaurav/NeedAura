@@ -246,11 +246,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
-          const { data: profile } = await supabase
+          const { data: profile, error: selectError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
+
+          if (selectError && selectError.code !== 'PGRST116') {
+            console.error('Failed to select user profile in syncSession:', selectError);
+            throw new Error(`[DB SELECT ERROR] Code: ${selectError.code}. Message: ${selectError.message}. Details: ${selectError.details}. Hint: ${selectError.hint}`);
+          }
 
           if (profile) {
             setUserState(profile);
@@ -309,11 +314,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       try {
         if (session?.user) {
-          const { data: profile } = await supabase
+          const { data: profile, error: selectError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
+
+          if (selectError && selectError.code !== 'PGRST116') {
+            console.error('Failed to select user profile in onAuthStateChange:', selectError);
+            throw new Error(`[DB SELECT ERROR] Code: ${selectError.code}. Message: ${selectError.message}. Details: ${selectError.details}. Hint: ${selectError.hint}`);
+          }
+
           if (profile) {
             setUserState(profile);
             localStorage.setItem('aura_user', JSON.stringify(profile));

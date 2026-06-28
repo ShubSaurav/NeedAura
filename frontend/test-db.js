@@ -48,8 +48,6 @@ async function testInsert() {
     aura_score: 100,
     aura_points: 0,
     is_verified: false,
-    is_aadhaar_verified: false,
-    onboarding_completed: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   };
