@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Upload, Cpu, ShieldCheck, HelpCircle, ArrowLeft, ArrowRight, AlertTriangle, Zap } from 'lucide-react';
+import { Upload, Cpu, ShieldCheck, HelpCircle, ArrowLeft, ArrowRight, AlertTriangle, Zap, X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Input, Textarea } from '@/components/ui/Input';
@@ -35,7 +35,8 @@ export default function SellListing() {
   const [auctionEndTime, setAuctionEndTime] = useState('');
 
   // UI Flow States
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisCompleted, setAnalysisCompleted] = useState(false);
   const [scamConfidence, setScamConfidence] = useState<'low' | 'medium' | 'high'>('low');
@@ -43,17 +44,23 @@ export default function SellListing() {
 
   // Trigger Aura Lens AI Valuation Scan
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    // Create a local object URL for preview
-    const localUrl = URL.createObjectURL(file);
-    setUploadedImage(localUrl);
+    // Generate object URLs for preview
+    const newUrls = files.map(file => URL.createObjectURL(file));
+    const updatedImages = [...uploadedImages, ...newUrls];
+    setUploadedImages(updatedImages);
+    
+    // Select the first of the newly uploaded batch
+    setSelectedImageIndex(uploadedImages.length);
+
+    // AI scans the primary file uploaded in this batch
+    const primaryFile = files[0];
     setIsAnalyzing(true);
     setAnalysisCompleted(false);
     setScanningLogs([]);
 
-    // Step-by-step logs simulation
     const logs = [
       '🔍 Analyzing image layout & resolution...',
       '🏷️ Extracting product specs & model tags...',
@@ -67,14 +74,13 @@ export default function SellListing() {
       }, (index + 1) * 600);
     });
 
-    // Read image as base64 and call Server Action
     const reader = new FileReader();
     reader.onload = async () => {
       try {
         const base64Data = (reader.result as string).split(',')[1];
-        const mimeType = file.type || 'image/jpeg';
+        const mimeType = primaryFile.type || 'image/jpeg';
         
-        const result = await analyzeListingImage(base64Data, mimeType, file.name);
+        const result = await analyzeListingImage(base64Data, mimeType, primaryFile.name);
         setIsAnalyzing(false);
         
         if (result.success && result.data) {
@@ -89,14 +95,13 @@ export default function SellListing() {
           setAnalysisCompleted(true);
         } else {
           setIsAnalyzing(false);
-          alert(`Analysis failed: ${result.error || 'Unknown error'}`);
         }
       } catch (err: any) {
         setIsAnalyzing(false);
         console.error('Failed to analyze image:', err);
       }
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(primaryFile);
   };
 
   // Re-run pricing analysis when title changes (simulates live database lookup)
@@ -156,7 +161,7 @@ export default function SellListing() {
       market_price: marketPrice || undefined,
       category,
       condition_score: conditionScore,
-      image_urls: uploadedImage ? [uploadedImage] : [],
+      image_urls: uploadedImages,
       listing_type: listingType,
       pickup_zone: pickupZone,
       status: 'active',
@@ -190,11 +195,12 @@ export default function SellListing() {
               <CardDescription>Drag and drop a photo to let Aura Lens AI categorize, describe, and value your item automatically.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="relative aspect-square rounded-xl border border-dashed border-card-border bg-slate-950/50 flex flex-col items-center justify-center p-6 text-center hover:border-brand-blue/50 transition-all duration-300">
-                {uploadedImage ? (
+              {/* Main Image Preview Card */}
+              <div className="relative aspect-square rounded-xl border border-dashed border-card-border bg-slate-950/50 flex flex-col items-center justify-center p-6 text-center hover:border-brand-blue/50 transition-all duration-300 overflow-hidden">
+                {uploadedImages.length > 0 ? (
                   <div className="absolute inset-0 p-2">
                     <div className="relative w-full h-full rounded-lg overflow-hidden flex items-center justify-center bg-slate-900">
-                      <img src={uploadedImage} alt="Uploaded product" className="w-full h-full object-cover" />
+                      <img src={uploadedImages[selectedImageIndex]} alt="Uploaded product preview" className="w-full h-full object-cover" />
                       
                       {/* Scanning vertical line animation */}
                       {isAnalyzing && (
@@ -228,7 +234,7 @@ export default function SellListing() {
                         </div>
                       )}
                       {!isAnalyzing && analysisCompleted && (
-                        <div className="absolute top-3 right-3">
+                        <div className="absolute top-3 right-3 z-10">
                           <Badge variant="green" glow>AI Classified</Badge>
                         </div>
                       )}
@@ -237,17 +243,65 @@ export default function SellListing() {
                 ) : (
                   <>
                     <Upload className="w-12 h-12 text-slate-700 mb-4 animate-bounce" />
-                    <span className="text-sm text-slate-400 block font-medium">Drag photo here or click browse</span>
-                    <span className="text-xs text-slate-600 mt-1">Supports PNG, JPG, WEBP</span>
+                    <span className="text-sm text-slate-400 block font-medium">Drag photos here or click browse</span>
+                    <span className="text-xs text-slate-600 mt-1">Supports multiple PNG, JPG, WEBP</span>
                     <input
                       type="file"
                       accept="image/*"
+                      multiple
                       onChange={handlePhotoUpload}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
                   </>
                 )}
               </div>
+
+              {/* Thumbnails Gallery Grid */}
+              {uploadedImages.length > 0 && (
+                <div className="grid grid-cols-5 gap-2.5 pt-1">
+                  {uploadedImages.map((img, idx) => (
+                    <div 
+                      key={idx}
+                      onClick={() => setSelectedImageIndex(idx)}
+                      className={`relative aspect-square rounded-lg overflow-hidden bg-slate-900 border cursor-pointer group/thumb transition-all ${
+                        selectedImageIndex === idx ? 'border-brand-blue ring-2 ring-brand-blue/20' : 'border-card-border hover:border-slate-600'
+                      }`}
+                    >
+                      <img src={img} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
+                      
+                      {/* Delete Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const updated = uploadedImages.filter((_, i) => i !== idx);
+                          setUploadedImages(updated);
+                          if (selectedImageIndex >= updated.length) {
+                            setSelectedImageIndex(Math.max(0, updated.length - 1));
+                          }
+                        }}
+                        className="absolute -top-1 -right-1 p-1 bg-slate-950/90 hover:bg-brand-orange border border-card-border rounded-bl-lg text-slate-400 hover:text-white transition-colors opacity-0 group-hover/thumb:opacity-100 z-10"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* Add More Thumbnail Trigger Card */}
+                  {uploadedImages.length < 5 && (
+                    <div className="relative aspect-square rounded-lg border border-dashed border-card-border bg-slate-950/30 hover:bg-slate-950/60 flex items-center justify-center cursor-pointer transition-colors">
+                      <Plus className="w-5 h-5 text-slate-500" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handlePhotoUpload}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Price comparison display card with interactive bar chart */}
               {analysisCompleted && suggestedPrice && (
