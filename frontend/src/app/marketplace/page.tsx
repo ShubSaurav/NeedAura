@@ -107,6 +107,7 @@ export default function MarketplaceFeed() {
 
   // Detail Modal state
   const [selectedListing, setSelectedListing] = useState<Listing | null>(null);
+  const [modalImageIndex, setModalImageIndex] = useState(0);
   const [bidAmount, setBidAmount] = useState('');
   const [bidStatus, setBidStatus] = useState<{ success?: boolean; error?: string } | null>(null);
   const [isBidding, setIsBidding] = useState(false);
@@ -419,6 +420,7 @@ export default function MarketplaceFeed() {
                   className="glass-panel border-card-border hover:border-brand-blue/30 rounded-2xl overflow-hidden cursor-pointer flex flex-col h-[380px] group transition-all duration-300 bg-card-dark relative"
                   onClick={() => {
                     setSelectedListing(listing);
+                    setModalImageIndex(0);
                     setBidStatus(null);
                     setBidAmount('');
                   }}
@@ -527,158 +529,195 @@ export default function MarketplaceFeed() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-lg"
+              className="w-full max-w-3xl"
             >
               <Card className="border-brand-blue/30 shadow-[0_0_20px_rgba(0,102,255,0.05)] bg-card-dark relative overflow-hidden">
                 <button
                   onClick={() => setSelectedListing(null)}
-                  className="absolute top-4 right-4 p-1.5 hover:bg-slate-900 rounded-lg text-slate-500 hover:text-white transition-colors"
+                  className="absolute top-4 right-4 p-1.5 hover:bg-slate-900 rounded-lg text-slate-500 hover:text-white transition-colors z-30"
                 >
                   <X className="w-5 h-5" />
                 </button>
 
-                <CardHeader className="pr-12">
-                  <div className="flex items-center gap-2">
-                    <Badge variant={getBadgeVariant(selectedListing.listing_type)} glow>
-                      {selectedListing.listing_type.toUpperCase()}
-                    </Badge>
-                    <Badge variant="blue">{selectedListing.category}</Badge>
-                  </div>
-                  <CardTitle className="text-2xl mt-2 font-display">{selectedListing.title}</CardTitle>
-                  <CardDescription className="flex items-center gap-1 text-slate-500 font-mono text-xs">
-                    <MapPin className="w-3.5 h-3.5 text-brand-orange" /> Pickup Zone: {selectedListing.pickup_zone}
-                  </CardDescription>
-                </CardHeader>
-
-                <CardContent className="space-y-6">
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Description</span>
-                    <p className="text-sm text-slate-300 leading-relaxed font-sans bg-slate-950/40 p-3 rounded-lg border border-card-border/40">
-                      {selectedListing.description}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-slate-950/60 rounded-lg border border-card-border">
-                      <span className="text-xs text-slate-500 block">Condition Check</span>
-                      <span className="font-semibold text-brand-blue font-display">{selectedListing.condition_score}% Quality Score</span>
-                    </div>
-                    <div className="p-3 bg-slate-950/60 rounded-lg border border-card-border">
-                      <span className="text-xs text-slate-500 block">Price / Starting Bid</span>
-                      <span className="font-semibold text-white font-mono">₹{selectedListing.price}</span>
-                    </div>
-                  </div>
-
-                  {selectedListing.suggested_price && (
-                    <div className="p-4 bg-brand-blue/5 rounded-lg border border-brand-blue/15 space-y-2">
-                      <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
-                        <span className="flex items-center gap-1"><Cpu className="w-3.5 h-3.5 text-brand-blue" /> Aura Lens AI Valuation Check</span>
-                        <span className="text-emerald-400 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> Checked</span>
-                      </div>
-                      <div className="flex justify-between items-center pt-1 border-t border-card-border/20">
-                        <span className="text-xs text-slate-400">Estimated Resale Price:</span>
-                        <span className="text-sm font-bold text-brand-orange">₹{selectedListing.suggested_price}</span>
-                      </div>
-                      {selectedListing.market_price && (
-                        <div className="flex justify-between items-center text-[10px] text-slate-500">
-                          <span>Original retail market value:</span>
-                          <span className="line-through">₹{selectedListing.market_price}</span>
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-0">
+                  {/* Left Column: Image Gallery */}
+                  <div className="md:col-span-5 bg-slate-950 border-r border-card-border/30 flex flex-col p-4 justify-center items-center gap-4 min-h-[300px] md:min-h-[400px]">
+                    <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-slate-900 border border-card-border/40 flex items-center justify-center">
+                      {selectedListing.image_urls && selectedListing.image_urls[modalImageIndex] && !selectedListing.image_urls[modalImageIndex].includes('mock-') ? (
+                        <img 
+                          src={selectedListing.image_urls[modalImageIndex]} 
+                          alt={selectedListing.title} 
+                          className="w-full h-full object-contain p-2" 
+                        />
+                      ) : (
+                        renderProductVisual(selectedListing.category)
                       )}
                     </div>
-                  )}
 
-                  {/* Seller trust scoring */}
-                  <div className="p-3 bg-slate-900/30 rounded-lg border border-card-border/40 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-slate-950 border border-brand-orange/30 flex items-center justify-center text-xs font-bold text-brand-orange">
-                        {selectedListing.seller_id === user?.id ? 'ME' : 'SS'}
+                    {/* Thumbnail strip */}
+                    {selectedListing.image_urls && selectedListing.image_urls.length > 1 && (
+                      <div className="flex gap-2 justify-center w-full overflow-x-auto pb-1">
+                        {selectedListing.image_urls.map((img, idx) => (
+                          <div 
+                            key={idx}
+                            onClick={() => setModalImageIndex(idx)}
+                            className={`relative w-12 h-12 rounded-md overflow-hidden bg-slate-900 border cursor-pointer transition-all ${
+                              modalImageIndex === idx ? 'border-brand-blue ring-2 ring-brand-blue/20' : 'border-card-border hover:border-slate-500'
+                            }`}
+                          >
+                            <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
+                          </div>
+                        ))}
                       </div>
-                      <div>
-                        <span className="text-xs font-semibold text-white block">
-                          {selectedListing.seller_id === user?.id ? `${user.full_name} (You)` : 'Shubham Saurav'}
-                        </span>
-                        <span className="text-[10px] text-slate-500 font-mono">Chitkara Campus (CS)</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-card-border">
-                      <Zap className="w-3.5 h-3.5 text-brand-orange fill-brand-orange" />
-                      <span className="text-xs font-bold text-white font-mono">120 Aura</span>
-                    </div>
+                    )}
                   </div>
 
-                  {/* Action forms/buttons */}
-                  {selectedListing.seller_id === user?.id || selectedListing.seller_id === 'current-user-id' ? (
-                    <div className="border-t border-card-border/30 pt-4 space-y-3">
-                      {!selectedListing.is_pinned ? (
-                        <div className="p-4 bg-brand-orange/5 border border-brand-orange/15 rounded-2xl space-y-2 text-center">
-                          <p className="text-xs font-bold text-white flex justify-center items-center gap-1.5">
-                            <img src="/logo.png" alt="Logo" className="w-4.5 h-auto object-contain shrink-0" /> Want to sell 10x faster?
+                  {/* Right Column: Listing Details */}
+                  <div className="md:col-span-7 flex flex-col">
+                    <CardHeader className="pr-12 pb-2">
+                      <div className="flex items-center gap-2">
+                        <Badge variant={getBadgeVariant(selectedListing.listing_type)} glow>
+                          {selectedListing.listing_type.toUpperCase()}
+                        </Badge>
+                        <Badge variant="blue">{selectedListing.category}</Badge>
+                      </div>
+                      <CardTitle className="text-2xl mt-2 font-display">{selectedListing.title}</CardTitle>
+                      <CardDescription className="flex items-center gap-1 text-slate-500 font-mono text-xs">
+                        <MapPin className="w-3.5 h-3.5 text-brand-orange" /> Pickup Zone: {selectedListing.pickup_zone}
+                      </CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="space-y-4 pb-6 flex-1 flex flex-col justify-between">
+                      <div className="space-y-4">
+                        <div className="space-y-1.5">
+                          <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider block">Description</span>
+                          <p className="text-sm text-slate-300 leading-relaxed font-sans bg-slate-950/40 p-3 rounded-lg border border-card-border/40">
+                            {selectedListing.description}
                           </p>
-                          <p className="text-[10px] text-slate-400">Pin this listing to the very top of your campus marketplace feed.</p>
-                          <Button 
-                            variant="accent" 
-                            glow 
-                            size="sm"
-                            className="w-full mt-1.5 py-2.5 font-bold"
-                            onClick={() => {
-                              setSelectedListing(null);
-                              handleStartBoost(selectedListing);
-                            }}
-                          >
-                            Boost Listing for ₹99
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="p-3 bg-slate-950/60 rounded-lg border border-card-border">
+                            <span className="text-xs text-slate-500 block">Condition Check</span>
+                            <span className="font-semibold text-brand-blue font-display">{selectedListing.condition_score}% Quality Score</span>
+                          </div>
+                          <div className="p-3 bg-slate-950/60 rounded-lg border border-card-border">
+                            <span className="text-xs text-slate-500 block">Price / Starting Bid</span>
+                            <span className="font-semibold text-white font-mono">₹{selectedListing.price}</span>
+                          </div>
+                        </div>
+
+                        {selectedListing.suggested_price && (
+                          <div className="p-3 bg-brand-blue/5 rounded-lg border border-brand-blue/15 space-y-1.5">
+                            <div className="flex items-center justify-between text-xs text-slate-500 font-mono">
+                              <span className="flex items-center gap-1"><Cpu className="w-3.5 h-3.5 text-brand-blue" /> Aura Lens AI Valuation Check</span>
+                              <span className="text-emerald-400 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5" /> Checked</span>
+                            </div>
+                            <div className="flex justify-between items-center pt-1 border-t border-card-border/20">
+                              <span className="text-xs text-slate-400">Estimated Resale Price:</span>
+                              <span className="text-sm font-bold text-brand-orange">₹{selectedListing.suggested_price}</span>
+                            </div>
+                            {selectedListing.market_price && (
+                              <div className="flex justify-between items-center text-[10px] text-slate-500">
+                                <span>Original retail market value:</span>
+                                <span className="line-through">₹{selectedListing.market_price}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Seller trust scoring */}
+                        <div className="p-2.5 bg-slate-900/30 rounded-lg border border-card-border/40 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-full bg-slate-950 border border-brand-orange/30 flex items-center justify-center text-[10px] font-bold text-brand-orange">
+                              {selectedListing.seller_id === user?.id ? 'ME' : 'SS'}
+                            </div>
+                            <div>
+                              <span className="text-xs font-semibold text-white block">
+                                {selectedListing.seller_id === user?.id ? `${user.full_name} (You)` : 'Shubham Saurav'}
+                              </span>
+                              <span className="text-[9px] text-slate-500 font-mono">Chitkara Campus (CS)</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 bg-slate-950 px-2 py-1 rounded-md border border-card-border">
+                            <Zap className="w-3.5 h-3.5 text-brand-orange fill-brand-orange" />
+                            <span className="text-[10px] font-bold text-white font-mono">120 Aura</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action forms/buttons */}
+                      {selectedListing.seller_id === user?.id || selectedListing.seller_id === 'current-user-id' ? (
+                        <div className="border-t border-card-border/30 pt-4 space-y-2">
+                          {!selectedListing.is_pinned ? (
+                            <div className="p-3 bg-brand-orange/5 border border-brand-orange/15 rounded-xl space-y-1.5 text-center">
+                              <p className="text-xs font-bold text-white flex justify-center items-center gap-1.5">
+                                <img src="/logo.png" alt="Logo" className="w-4 h-auto object-contain shrink-0" /> Want to sell 10x faster?
+                              </p>
+                              <Button 
+                                variant="accent" 
+                                glow 
+                                size="sm"
+                                className="w-full py-2 font-bold text-xs"
+                                onClick={() => {
+                                  setSelectedListing(null);
+                                  handleStartBoost(selectedListing);
+                                }}
+                              >
+                                Boost Listing for ₹99
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="p-2 bg-emerald-500/10 border border-emerald-500/25 rounded-xl text-center">
+                              <p className="text-xs font-semibold text-emerald-400 flex items-center justify-center gap-2 font-mono">
+                                <img src="/logo.png" alt="Logo" className="w-4 h-auto object-contain shrink-0" /> ACTIVE BOOST: PINNED TO TOP
+                              </p>
+                            </div>
+                          )}
+                          <Button variant="secondary" onClick={() => setSelectedListing(null)} className="w-full py-2 text-xs">
+                            Close
                           </Button>
                         </div>
+                      ) : selectedListing.listing_type === 'auction' ? (
+                        <form onSubmit={handlePlaceBid} className="border-t border-card-border/30 pt-4 space-y-2">
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              placeholder={`Bid higher than ₹${selectedListing.price}`}
+                              value={bidAmount}
+                              onChange={(e) => setBidAmount(e.target.value)}
+                              required
+                              disabled={isBidding}
+                              className="flex-1 h-9 text-xs"
+                            />
+                            <Button type="submit" variant="primary" glow disabled={isBidding} className="px-4 font-semibold text-xs h-9">
+                              {isBidding ? 'Placing bid...' : 'Place Bid'}
+                            </Button>
+                          </div>
+
+                          {bidStatus && (
+                            <div className={`text-[10px] font-semibold py-1 px-2.5 rounded ${
+                              bidStatus.success ? 'text-emerald-400 bg-emerald-950/20' : 'text-rose-400 bg-rose-950/20'
+                            }`}>
+                              {bidStatus.success ? 'Success! Bid placed.' : bidStatus.error}
+                            </div>
+                          )}
+                        </form>
                       ) : (
-                        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/25 rounded-2xl text-center">
-                          <p className="text-xs font-semibold text-emerald-400 flex items-center justify-center gap-2 font-mono">
-                            <img src="/logo.png" alt="Logo" className="w-4.5 h-auto object-contain shrink-0" /> ACTIVE BOOST: PINNED TO TOP
-                          </p>
+                        <div className="border-t border-card-border/30 pt-4 flex gap-2">
+                          <Button variant="secondary" onClick={() => setSelectedListing(null)} className="flex-1 py-2 text-xs">
+                            Close
+                          </Button>
+                          <Link href={`/chat?listingId=${selectedListing.id}`} className="flex-1">
+                            <Button variant="primary" glow className="w-full gap-2 font-semibold py-2 text-xs">
+                              <MessageSquare className="w-3.5 h-3.5" /> Start Negotiation
+                            </Button>
+                          </Link>
                         </div>
                       )}
-                      <Button variant="secondary" onClick={() => setSelectedListing(null)} className="w-full">
-                        Close
-                      </Button>
-                    </div>
-                  ) : selectedListing.listing_type === 'auction' ? (
-                    <form onSubmit={handlePlaceBid} className="border-t border-card-border/30 pt-4 space-y-3">
-                      <div className="flex gap-2">
-                        <Input
-                          type="number"
-                          placeholder={`Bid higher than ₹${selectedListing.price}`}
-                          value={bidAmount}
-                          onChange={(e) => setBidAmount(e.target.value)}
-                          required
-                          disabled={isBidding}
-                          className="flex-1"
-                        />
-                        <Button type="submit" variant="primary" glow disabled={isBidding} className="px-5 font-semibold text-sm">
-                          {isBidding ? 'Placing bid...' : 'Place Bid'}
-                        </Button>
-                      </div>
-
-                      {bidStatus && (
-                        <div className={`text-xs font-semibold py-1 px-2.5 rounded ${
-                          bidStatus.success ? 'text-emerald-400 bg-emerald-950/20' : 'text-rose-400 bg-rose-950/20'
-                        }`}>
-                          {bidStatus.success ? 'Success! Bid placed.' : bidStatus.error}
-                        </div>
-                      )}
-                    </form>
-                  ) : (
-                    <div className="border-t border-card-border/30 pt-4 flex gap-2">
-                      <Button variant="secondary" onClick={() => setSelectedListing(null)} className="flex-1">
-                        Close
-                      </Button>
-                      <Link href={`/chat?listingId=${selectedListing.id}`} className="flex-1">
-                        <Button variant="primary" glow className="w-full gap-2 font-semibold">
-                          <MessageSquare className="w-4 h-4" /> Start Negotiation
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-
-                </CardContent>
+                    </CardContent>
+                  </div>
+                </div>
               </Card>
             </motion.div>
           </div>
