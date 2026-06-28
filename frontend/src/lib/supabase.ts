@@ -1,4 +1,5 @@
 import { createBrowserClient, createServerClient as createSupabaseServerClient } from '@supabase/ssr';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 // Environment variables checks
 const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock-supabase.supabase.co').trim();
@@ -8,21 +9,23 @@ if (typeof window !== 'undefined') {
   console.log('[Supabase Init] Browser Client configured with URL:', supabaseUrl);
 }
 
-let browserClient: ReturnType<typeof createBrowserClient> | undefined;
+let browserClient: ReturnType<typeof createSupabaseClient> | undefined;
 
 /**
  * Creates a Supabase client for use in browser components.
+ * Uses standard supabase-js client to guarantee localStorage persistence.
  */
 export function createClient() {
   if (typeof window === 'undefined') {
+    // For SSR rendering fallback
     return createBrowserClient(supabaseUrl, supabaseAnonKey);
   }
 
   if (!browserClient) {
-    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+    browserClient = createSupabaseClient(supabaseUrl, supabaseAnonKey, {
       auth: {
-        flowType: 'implicit',
         persistSession: true,
+        autoRefreshToken: true,
         detectSessionInUrl: true,
       }
     });
@@ -37,8 +40,11 @@ export function createClient() {
 export async function createServerClient() {
   const { cookies } = await import('next/headers');
   const cookieStore = await cookies();
+  
+  const accessToken = cookieStore.get('sb-access-token')?.value;
+  const refreshToken = cookieStore.get('sb-refresh-token')?.value;
 
-  return createSupabaseServerClient(
+  const client = createSupabaseServerClient(
     supabaseUrl,
     supabaseAnonKey,
     {
@@ -52,11 +58,24 @@ export async function createServerClient() {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing user sessions.
+            // Can be ignored in Server Components
           }
         },
       },
     }
   );
+
+  // Manually authenticate the server client if our synchronized cookies exist
+  if (accessToken && refreshToken) {
+    try {
+      await client.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    } catch (err) {
+      console.error('[Supabase Server Init] Failed to set session from cookies:', err);
+    }
+  }
+
+  return client;
 }

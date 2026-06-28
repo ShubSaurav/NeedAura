@@ -253,6 +253,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
+          const expires = new Date();
+          expires.setTime(expires.getTime() + (30 * 24 * 60 * 60 * 1000));
+          document.cookie = `sb-access-token=${session.access_token}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
+          document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
           const { data: profile, error: selectError } = await supabase
             .from('profiles')
             .select('*')
@@ -296,6 +300,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             localStorage.setItem('aura_user', JSON.stringify(newProfile));
           }
         } else {
+          document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax`;
+          document.cookie = `sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax`;
           // If offline mock user exists from earlier tests, clean it
           const savedUser = localStorage.getItem('aura_user');
           if (savedUser) {
@@ -321,6 +327,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       try {
         if (session?.user) {
+          const expires = new Date();
+          expires.setTime(expires.getTime() + (30 * 24 * 60 * 60 * 1000));
+          document.cookie = `sb-access-token=${session.access_token}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
+          document.cookie = `sb-refresh-token=${session.refresh_token}; path=/; expires=${expires.toUTCString()}; SameSite=Lax`;
           const { data: profile, error: selectError } = await supabase
             .from('profiles')
             .select('*')
@@ -364,6 +374,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             localStorage.setItem('aura_user', JSON.stringify(newProfile));
           }
         } else {
+          document.cookie = `sb-access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax`;
+          document.cookie = `sb-refresh-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax`;
           setUserState(null);
           localStorage.removeItem('aura_user');
         }
