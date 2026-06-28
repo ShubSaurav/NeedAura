@@ -1,7 +1,7 @@
 'use client';
 import Header from '@/components/Header';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -98,6 +98,49 @@ export default function SellListing() {
     };
     reader.readAsDataURL(file);
   };
+
+  // Re-run pricing analysis when title changes (simulates live database lookup)
+  useEffect(() => {
+    if (isAnalyzing) return;
+    
+    const lowercaseTitle = title.toLowerCase();
+    let suggested = 150;
+    let market = 350;
+    let detectedCategory = category;
+    let desc = description;
+    
+    if (lowercaseTitle.includes('kettle') || lowercaseTitle.includes('agaro') || lowercaseTitle.includes('heater') || lowercaseTitle.includes('water')) {
+      suggested = 599;
+      market = 1199;
+      detectedCategory = 'Hostel Essentials';
+      desc = 'Crucial hostel companion for late-night Maggi and tea! 🫖 Stainless steel body, automatic shut-off safety, boils water in 2 minutes. Perfect condition!';
+    } else if (lowercaseTitle.includes('chair') || lowercaseTitle.includes('desk') || lowercaseTitle.includes('table') || lowercaseTitle.includes('furniture')) {
+      suggested = 1200;
+      market = 3200;
+      detectedCategory = 'Furniture';
+      desc = 'Super comfy chair for late-night study sessions or gaming marathons. Height adjustable, breathable mesh backing. Fits perfectly under hostel desks!';
+    } else if (lowercaseTitle.includes('calc') || lowercaseTitle.includes('scientific') || lowercaseTitle.includes('casio')) {
+      suggested = 650;
+      market = 1350;
+      detectedCategory = 'Electronics';
+      desc = 'Need to pass your engineering mathematics? 📈 This Casio calculator is a absolute lifesaver. Has all equations pre-loaded. Condition is 10/10, no scratches.';
+    } else if (lowercaseTitle.includes('book') || lowercaseTitle.includes('algorithms') || lowercaseTitle.includes('clrs') || lowercaseTitle.includes('study')) {
+      suggested = 400;
+      market = 999;
+      detectedCategory = 'Books';
+      desc = 'The holy grail of DSA 💻. Thick book but covers everything you need for coding interviews and exams. Minimal highlighting inside, clean pages.';
+    } else if (lowercaseTitle.includes('cycle') || lowercaseTitle.includes('bicycle') || lowercaseTitle.includes('hero')) {
+      suggested = 2500;
+      market = 6500;
+      detectedCategory = 'Cycles';
+      desc = 'Perfect for getting across campus quickly! 🚲 Tires are in great shape, handbrakes are responsive, and comes with a front basket and lock.';
+    }
+
+    setSuggestedPrice(suggested);
+    setMarketPrice(market);
+    setCategory(detectedCategory);
+    setDescription(desc);
+  }, [title]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
