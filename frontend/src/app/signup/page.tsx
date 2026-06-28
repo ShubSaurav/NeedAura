@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -17,6 +17,9 @@ export default function Signup() {
   const router = useRouter();
   const { user, setUser } = useApp();
   
+  // Track if we checked the user session on initial page mount
+  const hasCheckedInitialUser = useRef(false);
+  
   // Sign up method: 'email' or 'phone'
   const [signupMethod, setSignupMethod] = useState<'email' | 'phone'>('email');
   
@@ -24,7 +27,7 @@ export default function Signup() {
   const [phone, setPhone] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
-  const [branch, setBranch] = useState('');
+  const [branch, setBranch] = useState('Computer Science');
   const [hostel, setHostel] = useState('');
   const [recognizedUniversity, setRecognizedUniversity] = useState<string | null>(null);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -37,12 +40,15 @@ export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRealSupabase, setIsRealSupabase] = useState(false);
 
-  // Redirect if user is already logged in
+  // Redirect ONLY if user was already logged in on initial load
   useEffect(() => {
-    if (user && !isRegistered) {
+    if (user && !hasCheckedInitialUser.current) {
       router.push('/marketplace');
     }
-  }, [user, router, isRegistered]);
+    if (user) {
+      hasCheckedInitialUser.current = true;
+    }
+  }, [user, router]);
 
   useEffect(() => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
