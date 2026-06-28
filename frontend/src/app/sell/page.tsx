@@ -240,7 +240,7 @@ export default function SellListing() {
                 {uploadedImages.length > 0 ? (
                   <div className="absolute inset-0 p-2">
                     <div className="relative w-full h-full rounded-lg overflow-hidden flex items-center justify-center bg-slate-900">
-                      <img src={uploadedImages[selectedImageIndex]} alt="Uploaded product preview" className="w-full h-full object-cover" />
+                      <img src={uploadedImages[selectedImageIndex]} alt="Uploaded product preview" className="w-full h-full object-contain p-3" />
                       
                       {/* Scanning vertical line animation */}
                       {isAnalyzing && (

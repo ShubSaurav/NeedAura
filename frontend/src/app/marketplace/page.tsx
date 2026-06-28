@@ -445,7 +445,7 @@ export default function MarketplaceFeed() {
                     )}
                     
                     {listing.image_urls && listing.image_urls[0] && !listing.image_urls[0].includes('mock-') ? (
-                      <img src={listing.image_urls[0]} alt={listing.title} className="w-full h-full object-cover" />
+                      <img src={listing.image_urls[0]} alt={listing.title} className="w-full h-full object-contain p-3 transition-transform duration-500 group-hover:scale-105" />
                     ) : (
                       renderProductVisual(listing.category)
                     )}
