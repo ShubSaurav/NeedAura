@@ -21,8 +21,8 @@ export class AIService {
     }
 
     try {
-      // Query Gemini 1.5 Flash endpoint
-      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+      // Query Gemini Flash endpoint
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
       
       const prompt = `
         You are the backend AI for "NeedAura", a college student marketplace. 
