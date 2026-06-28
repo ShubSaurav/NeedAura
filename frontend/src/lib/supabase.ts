@@ -19,7 +19,13 @@ export function createClient() {
   }
 
   if (!browserClient) {
-    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey);
+    browserClient = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        flowType: 'implicit',
+        persistSession: true,
+        detectSessionInUrl: true,
+      }
+    });
   }
 
   return browserClient;

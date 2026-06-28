@@ -227,7 +227,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Sync session and retrieve profile
     const syncSession = async () => {
       try {
-        // Client-side OAuth code exchange check (fallback if redirected to home/marketplace directly)
+        // Client-side OAuth code/token exchange check
         if (typeof window !== 'undefined') {
           const urlParams = new URLSearchParams(window.location.search);
           const code = urlParams.get('code');
@@ -241,6 +241,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             } else {
               console.error('[AppContext] Client-side code exchange error:', exchangeError.message);
             }
+          }
+
+          // Clean access_token from hash fragment if present
+          if (window.location.hash && window.location.hash.includes('access_token')) {
+            console.log('[AppContext] Detected access_token in hash fragment. Cleaning URL...');
+            const newUrl = window.location.pathname + window.location.search;
+            window.history.replaceState({}, document.title, newUrl);
           }
         }
 
