@@ -19,64 +19,77 @@ const renderProductVisual = (category: string) => {
   switch (category) {
     case 'Electronics':
       return (
-        <div className="w-full h-full bg-gradient-to-br from-blue-600/20 via-slate-950 to-indigo-950 flex flex-col items-center justify-center relative">
+        <div className="w-full h-full bg-gradient-to-br from-blue-600/20 via-slate-950 to-indigo-950 flex flex-col items-center justify-center relative p-4">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,102,255,0.15),transparent_60%)]" />
-          <svg className="w-14 h-14 text-brand-blue drop-shadow-[0_0_10px_rgba(0,102,255,0.4)] animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-            <line x1="12" y1="18" x2="12.01" y2="18" strokeWidth="3" />
-            <rect x="8" y="5" width="8" height="4" />
-            <line x1="8" y1="12" x2="10" y2="12" />
-            <line x1="14" y1="12" x2="16" y2="12" />
-            <line x1="8" y1="15" x2="10" y2="15" />
-            <line x1="14" y1="15" x2="16" y2="15" />
-          </svg>
-          <span className="text-[9px] font-mono text-brand-blue/80 tracking-widest uppercase mt-2">Electronics Ring</span>
+          <Image
+            src="/calculator.gif"
+            alt="Electronics"
+            width={90}
+            height={90}
+            className="object-contain drop-shadow-[0_0_8px_rgba(0,102,255,0.25)] relative z-10"
+            unoptimized
+          />
+          <span className="text-[9px] font-mono text-brand-blue/80 tracking-widest uppercase mt-2 relative z-10">Electronics Ring</span>
         </div>
       );
     case 'Books':
       return (
-        <div className="w-full h-full bg-gradient-to-br from-brand-orange/15 via-slate-950 to-orange-950/40 flex flex-col items-center justify-center relative">
+        <div className="w-full h-full bg-gradient-to-br from-brand-orange/15 via-slate-950 to-orange-950/40 flex flex-col items-center justify-center relative p-4">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,122,0,0.12),transparent_60%)]" />
-          <svg className="w-14 h-14 text-brand-orange drop-shadow-[0_0_10px_rgba(255,122,0,0.4)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-          </svg>
-          <span className="text-[9px] font-mono text-brand-orange/80 tracking-widest uppercase mt-2">Study Desk Library</span>
+          <Image
+            src="/books.gif"
+            alt="Books"
+            width={90}
+            height={90}
+            className="object-contain drop-shadow-[0_0_8px_rgba(255,122,0,0.25)] relative z-10"
+            unoptimized
+          />
+          <span className="text-[9px] font-mono text-brand-orange/80 tracking-widest uppercase mt-2 relative z-10">Study Desk Library</span>
         </div>
       );
     case 'Cycles':
       return (
-        <div className="w-full h-full bg-gradient-to-br from-emerald-600/20 via-slate-950 to-teal-950/40 flex flex-col items-center justify-center relative">
+        <div className="w-full h-full bg-gradient-to-br from-emerald-600/20 via-slate-950 to-teal-950/40 flex flex-col items-center justify-center relative p-4">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.12),transparent_60%)]" />
-          <svg className="w-16 h-16 text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="5.5" cy="17.5" r="3.5" />
-            <circle cx="18.5" cy="17.5" r="3.5" />
-            <path d="M15 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" />
-            <path d="M12 17.5V14l-3-3 4-3 2 3h2" />
-          </svg>
-          <span className="text-[9px] font-mono text-emerald-400/80 tracking-widest uppercase mt-2">Active Mobility</span>
+          <Image
+            src="/havingfunandsharing-delivery-20701_512.gif"
+            alt="Cycles"
+            width={95}
+            height={95}
+            className="object-contain relative z-10"
+            unoptimized
+          />
+          <span className="text-[9px] font-mono text-emerald-400/80 tracking-widest uppercase mt-2 relative z-10">Active Mobility</span>
         </div>
       );
     case 'Furniture':
       return (
-        <div className="w-full h-full bg-gradient-to-br from-amber-600/15 via-slate-950 to-yellow-950/30 flex flex-col items-center justify-center relative">
+        <div className="w-full h-full bg-gradient-to-br from-amber-600/15 via-slate-950 to-yellow-950/30 flex flex-col items-center justify-center relative p-4">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(245,158,11,0.12),transparent_60%)]" />
-          <svg className="w-14 h-14 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 11V9a4 4 0 0 1 8 0v2m0 0V9a4 4 0 0 1 8 0v2" />
-            <path d="M2 14h20v2H2z" />
-            <path d="M4 16v5m16-5v5" />
-          </svg>
-          <span className="text-[9px] font-mono text-amber-500/80 tracking-widest uppercase mt-2">Hostel Comfort</span>
+          <Image
+            src="/warehouse.gif"
+            alt="Furniture"
+            width={90}
+            height={90}
+            className="object-contain relative z-10"
+            unoptimized
+          />
+          <span className="text-[9px] font-mono text-amber-500/80 tracking-widest uppercase mt-2 relative z-10">Hostel Comfort</span>
         </div>
       );
     default:
       return (
-        <div className="w-full h-full bg-gradient-to-br from-slate-700/15 via-slate-950 to-slate-900/30 flex flex-col items-center justify-center relative">
+        <div className="w-full h-full bg-gradient-to-br from-slate-700/15 via-slate-950 to-slate-900/30 flex flex-col items-center justify-center relative p-4">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.05),transparent_60%)]" />
-          <svg className="w-14 h-14 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-          </svg>
-          <span className="text-[9px] font-mono text-slate-500 tracking-widest uppercase mt-2">Campus Package</span>
+          <Image
+            src="/online-supermarket.gif"
+            alt="Package"
+            width={90}
+            height={90}
+            className="object-contain relative z-10"
+            unoptimized
+          />
+          <span className="text-[9px] font-mono text-slate-500 tracking-widest uppercase mt-2 relative z-10">Campus Package</span>
         </div>
       );
   }
@@ -487,25 +500,14 @@ export default function MarketplaceFeed() {
                 <div className="absolute inset-0 rounded-full bg-brand-blue/5 animate-pulse" />
                 <div className="absolute inset-4 rounded-full border border-brand-blue/10" />
                 
-                {/* Custom SVG empty state illustration */}
-                <svg className="w-20 h-20 text-slate-700 relative z-10" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  {/* Empty Box/crate perspective */}
-                  <path d="M50 15 L85 30 L85 70 L50 85 L15 70 L15 30 Z" className="text-slate-800" strokeWidth="1.5" />
-                  <path d="M50 15 L50 85" className="text-slate-800" strokeWidth="1.5" />
-                  <path d="M15 30 L50 45 L85 30" className="text-slate-800" strokeWidth="1.5" />
-                  
-                  {/* Floating particles */}
-                  <circle cx="28" cy="22" r="1.5" className="text-brand-orange animate-pulse" fill="currentColor" />
-                  <circle cx="72" cy="25" r="1.5" className="text-brand-blue animate-pulse" fill="currentColor" />
-                  <circle cx="80" cy="62" r="2" className="text-slate-600" />
-                  <circle cx="20" cy="65" r="2" className="text-slate-600" />
-                  
-                  {/* Magnifying Glass looking for items */}
-                  <g className="text-brand-blue">
-                    <circle cx="50" cy="45" r="12" stroke="currentColor" strokeWidth="2.5" fill="none" />
-                    <line x1="58.5" y1="53.5" x2="72" y2="67" stroke="currentColor" strokeWidth="3" />
-                  </g>
-                </svg>
+                <Image
+                  src="/shopping-bags.gif"
+                  alt="No Campus Listings Found"
+                  width={150}
+                  height={150}
+                  className="object-contain mx-auto mb-2 opacity-80"
+                  unoptimized
+                />
               </div>
               <h4 className="font-bold text-slate-300 text-lg font-display">No Campus Listings Found</h4>
               <p className="text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
@@ -847,13 +849,34 @@ export default function MarketplaceFeed() {
               </div>
 
               {paySuccess ? (
-                <div className="text-center py-8 space-y-4">
-                  <div className="w-12 h-12 mx-auto rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                    <ShieldCheck className="w-6 h-6" />
-                  </div>
+                <div className="text-center py-6 space-y-4">
+                  <Image
+                    src="/receipt.gif"
+                    alt="Payment successful"
+                    width={135}
+                    height={135}
+                    className="object-contain mx-auto"
+                    unoptimized
+                  />
                   <div>
-                    <h4 className="font-bold text-white">Payment Confirmed!</h4>
-                    <p className="text-xs text-slate-500">Your listing is now featured at the top of the feed.</p>
+                    <h4 className="font-bold text-white text-lg">Listing Boosted!</h4>
+                    <p className="text-xs text-emerald-400 font-mono font-bold">Invoice Receipt Generated</p>
+                    <p className="text-xs text-slate-500 mt-1">Your listing is now featured at the top of the feed.</p>
+                  </div>
+                </div>
+              ) : isPaying ? (
+                <div className="text-center py-10 space-y-4">
+                  <Image
+                    src="/shipping.gif"
+                    alt="Processing payment"
+                    width={150}
+                    height={150}
+                    className="object-contain mx-auto"
+                    unoptimized
+                  />
+                  <div className="animate-pulse">
+                    <h4 className="font-bold text-brand-orange text-base">Processing Secure Payment...</h4>
+                    <p className="text-[10px] text-slate-500 mt-1 font-mono">Contacting bank servers & pinning listing.</p>
                   </div>
                 </div>
               ) : (
