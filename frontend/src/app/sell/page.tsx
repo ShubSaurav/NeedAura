@@ -46,7 +46,7 @@ export default function SellListing() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Simulate image upload to Supabase storage by creating a local object URL
+    // Create a local object URL for preview
     const localUrl = URL.createObjectURL(file);
     setUploadedImage(localUrl);
     setIsAnalyzing(true);
@@ -67,24 +67,36 @@ export default function SellListing() {
       }, (index + 1) * 600);
     });
 
-    // Call Server Action
-    setTimeout(async () => {
-      // Pass a filename heuristic to retrieve correct mock data
-      const result = await analyzeListingImage(file.name);
-      setIsAnalyzing(false);
-      
-      if (result.success && result.data) {
-        setTitle(result.data.title);
-        setDescription(result.data.description);
-        setCategory(result.data.category);
-        setConditionScore(result.data.conditionScore);
-        setPrice(result.data.suggestedPrice.toString());
-        setSuggestedPrice(result.data.suggestedPrice);
-        setMarketPrice(result.data.marketPrice);
-        setScamConfidence(result.data.scamLevel);
-        setAnalysisCompleted(true);
+    // Read image as base64 and call Server Action
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const base64Data = (reader.result as string).split(',')[1];
+        const mimeType = file.type || 'image/jpeg';
+        
+        const result = await analyzeListingImage(base64Data, mimeType, file.name);
+        setIsAnalyzing(false);
+        
+        if (result.success && result.data) {
+          setTitle(result.data.title);
+          setDescription(result.data.description);
+          setCategory(result.data.category);
+          setConditionScore(result.data.conditionScore);
+          setPrice(result.data.suggestedPrice.toString());
+          setSuggestedPrice(result.data.suggestedPrice);
+          setMarketPrice(result.data.marketPrice);
+          setScamConfidence(result.data.scamLevel);
+          setAnalysisCompleted(true);
+        } else {
+          setIsAnalyzing(false);
+          alert(`Analysis failed: ${result.error || 'Unknown error'}`);
+        }
+      } catch (err: any) {
+        setIsAnalyzing(false);
+        console.error('Failed to analyze image:', err);
       }
-    }, 2800);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

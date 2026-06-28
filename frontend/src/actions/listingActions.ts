@@ -8,14 +8,18 @@ import { Listing } from '@shared/types/database';
 /**
  * Server Action: Calls Gemini Vision API to analyze product photos and retrieve description/resale details
  */
-export async function analyzeListingImage(imageUrl: string): Promise<{ success: boolean; data?: AIAnalysisResult; error?: string }> {
+export async function analyzeListingImage(
+  base64Image: string,
+  mimeType: string,
+  fileName?: string
+): Promise<{ success: boolean; data?: AIAnalysisResult; error?: string }> {
   try {
-    if (!imageUrl) {
-      return { success: false, error: 'No image URL provided.' };
+    if (!base64Image) {
+      return { success: false, error: 'No base64 image data provided.' };
     }
 
-    console.log(`Starting Server-side Gemini Visual Scan for product: ${imageUrl}`);
-    const analysis = await AIService.analyzeProductImage(imageUrl);
+    console.log(`Starting Server-side Gemini Visual Scan for file: ${fileName || 'unnamed'}`);
+    const analysis = await AIService.analyzeProductImage(base64Image, mimeType, fileName);
     
     return { success: true, data: analysis };
   } catch (error: any) {

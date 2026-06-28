@@ -12,22 +12,16 @@ export class AIService {
   /**
    * Analyzes an uploaded product image using Google Gemini Vision
    */
-  static async analyzeProductImage(imageUrl: string): Promise<AIAnalysisResult> {
+  static async analyzeProductImage(base64Image: string, mimeType: string, fileName?: string): Promise<AIAnalysisResult> {
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      console.warn('GEMINI_API_KEY is not set. Using mock AI analyzer.');
-      return this.getMockAnalysisResult(imageUrl);
+      console.warn('GEMINI_API_KEY is not set. Using smart mock AI analyzer based on filename.');
+      return this.getMockAnalysisResult(fileName || '');
     }
 
     try {
-      // 1. Download image and convert to base64 for Gemini multimodal API
-      const imageResponse = await fetch(imageUrl);
-      const arrayBuffer = await imageResponse.arrayBuffer();
-      const base64Image = Buffer.from(arrayBuffer).toString('base64');
-      const mimeType = imageResponse.headers.get('content-type') || 'image/jpeg';
-
-      // 2. Query Gemini 1.5 Flash endpoint
+      // Query Gemini 1.5 Flash endpoint
       const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
       
       const prompt = `
@@ -89,18 +83,17 @@ export class AIService {
       };
     } catch (error) {
       console.error('Error calling Gemini API, falling back to mock:', error);
-      return this.getMockAnalysisResult(imageUrl);
+      return this.getMockAnalysisResult(fileName || '');
     }
   }
 
   /**
    * Helper to return clean, brand-matching mock analysis results in local dev
    */
-  private static getMockAnalysisResult(imageUrl: string): AIAnalysisResult {
-    // Basic heuristics based on image filenames for mock testing
-    const lowercaseUrl = imageUrl.toLowerCase();
+  private static getMockAnalysisResult(fileName: string): AIAnalysisResult {
+    const lowercaseName = fileName.toLowerCase();
     
-    if (lowercaseUrl.includes('calc') || lowercaseUrl.includes('elec')) {
+    if (lowercaseName.includes('calc') || lowercaseName.includes('elec') || lowercaseName.includes('casio')) {
       return {
         title: 'Casio fx-991EX Scientific Calculator',
         description: 'Need to pass your engineering mathematics? 📈 This Casio calculator is a absolute lifesaver. Has all equations pre-loaded. Condition is 10/10, no scratches. #engineering #maths #casio',
@@ -112,7 +105,7 @@ export class AIService {
       };
     }
 
-    if (lowercaseUrl.includes('book') || lowercaseUrl.includes('note')) {
+    if (lowercaseName.includes('book') || lowercaseName.includes('note') || lowercaseName.includes('clrs') || lowercaseName.includes('study')) {
       return {
         title: 'Introduction to Algorithms (CLRS) - 3rd Edition',
         description: 'The holy grail of DSA 💻. Thick book but covers everything you need for coding interviews and exams. Minimal highlighting inside, clean pages. #dsa #placements #computerscience',
@@ -124,14 +117,50 @@ export class AIService {
       };
     }
 
+    if (lowercaseName.includes('cycle') || lowercaseName.includes('bicycle') || lowercaseName.includes('gear') || lowercaseName.includes('ride')) {
+      return {
+        title: 'Hero Sprint 26T Single Speed Cycle',
+        description: 'Perfect for getting across campus quickly! 🚲 Tires are in great shape, handbrakes are responsive, and comes with a front basket and lock. #campusride #fitness #hero',
+        category: 'Cycles',
+        conditionScore: 80,
+        suggestedPrice: 2500.00,
+        marketPrice: 6500.00,
+        scamLevel: 'low',
+      };
+    }
+
+    if (lowercaseName.includes('kettle') || lowercaseName.includes('agaro') || lowercaseName.includes('water') || lowercaseName.includes('tea')) {
+      return {
+        title: 'AGARO Elegant Electric Kettle (1.8L)',
+        description: 'Crucial hostel companion for late-night Maggi and tea! 🫖 Stainless steel body, automatic shut-off safety, boils water in 2 minutes. Perfect condition! #hostellife #maggi #tea',
+        category: 'Hostel Essentials',
+        conditionScore: 90,
+        suggestedPrice: 599.00,
+        marketPrice: 1199.00,
+        scamLevel: 'low',
+      };
+    }
+
+    if (lowercaseName.includes('chair') || lowercaseName.includes('table') || lowercaseName.includes('desk') || lowercaseName.includes('furniture')) {
+      return {
+        title: 'Ergonomic Study Chair with Mesh Back',
+        description: 'Super comfy chair for late-night study sessions or gaming marathons. Height adjustable, breathable mesh backing. Fits perfectly under hostel desks! #hostellife #gamer #studyhard',
+        category: 'Furniture',
+        conditionScore: 78,
+        suggestedPrice: 1200.00,
+        marketPrice: 3200.00,
+        scamLevel: 'low',
+      };
+    }
+
     // Default mock response
     return {
-      title: 'Ergonomic Study Chair',
-      description: 'Super comfy chair for late-night study sessions or gaming marathons. Height adjustable, breathable mesh backing. Fits perfectly under hostel desks! #hostellife #gamer #studyhard',
-      category: 'Furniture',
-      conditionScore: 78,
-      suggestedPrice: 1200.00,
-      marketPrice: 3200.00,
+      title: 'Multipurpose Student Utility Box',
+      description: 'Useful utility box to store accessories or styling tools in your hostel room. Clean and compact. #hostellife #organization',
+      category: 'Others',
+      conditionScore: 82,
+      suggestedPrice: 150.00,
+      marketPrice: 350.00,
       scamLevel: 'low',
     };
   }
