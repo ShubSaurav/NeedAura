@@ -37,6 +37,8 @@ export default function SellListing() {
   // UI Flow States
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisCompleted, setAnalysisCompleted] = useState(false);
   const [scamConfidence, setScamConfidence] = useState<'low' | 'medium' | 'high'>('low');
@@ -151,25 +153,32 @@ export default function SellListing() {
     e.preventDefault();
 
     if (!user) return;
+    setIsSubmitting(true);
+    setSubmitError(null);
 
-    addListing({
-      seller_id: user.id,
-      title,
-      description,
-      price: parseFloat(price) || 0,
-      suggested_price: suggestedPrice || undefined,
-      market_price: marketPrice || undefined,
-      category,
-      condition_score: conditionScore,
-      image_urls: uploadedImages,
-      listing_type: listingType,
-      pickup_zone: pickupZone,
-      status: 'active',
-      visibility,
-      is_pinned: false
-    });
+    try {
+      await addListing({
+        seller_id: user.id,
+        title,
+        description,
+        price: parseFloat(price) || 0,
+        suggested_price: suggestedPrice || undefined,
+        market_price: marketPrice || undefined,
+        category,
+        condition_score: conditionScore,
+        image_urls: uploadedImages,
+        listing_type: listingType,
+        pickup_zone: pickupZone,
+        status: 'active',
+        visibility,
+        is_pinned: false
+      });
 
-    router.push('/marketplace');
+      router.push('/marketplace');
+    } catch (err: any) {
+      setIsSubmitting(false);
+      setSubmitError(err.message || 'Failed to publish listing to Supabase database. Please check Row Level Security (RLS) policies.');
+    }
   };
 
 
@@ -534,8 +543,32 @@ export default function SellListing() {
                   </div>
                 </div>
 
-                <Button type="submit" variant="primary" glow className="w-full py-3.5 text-sm font-semibold flex items-center justify-center gap-1.5">
-                  Publish Listing <img src="/logo.png" alt="Logo" className="w-4.5 h-auto object-contain inline" />
+                {submitError && (
+                  <div className="text-sm text-brand-orange bg-brand-orange/5 p-3 rounded-xl border border-brand-orange/20 font-sans text-center mb-4">
+                    {submitError}
+                  </div>
+                )}
+
+                <Button 
+                  type="submit" 
+                  variant="primary" 
+                  glow 
+                  disabled={isSubmitting} 
+                  className="w-full py-3.5 text-sm font-semibold flex items-center justify-center gap-1.5"
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Publishing Listing...
+                    </span>
+                  ) : (
+                    <>
+                      Publish Listing <img src="/logo.png" alt="Logo" className="w-4.5 h-auto object-contain inline" />
+                    </>
+                  )}
                 </Button>
 
               </CardContent>

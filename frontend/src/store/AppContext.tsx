@@ -517,9 +517,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       visibility: listingInput.visibility
     });
 
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to create listing database row.');
+    }
+
     const newListing: Listing = {
       ...listingInput,
-      id: result.success && result.listingId ? result.listingId : `listing-${Date.now()}`,
+      id: result.listingId || `listing-${Date.now()}`,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
     };
